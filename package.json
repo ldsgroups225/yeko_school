@@ -31,6 +31,7 @@
     "@vite-pwa/nuxt": "^0.10.5",
     "@vueuse/nuxt": "^11.1.0",
     "consola": "^3.2.3",
+    "date-fns": "^4.1.0",
     "eslint": "^9.11.1",
     "eslint-plugin-format": "^0.1.2",
     "nuxt": "^3.13.2",

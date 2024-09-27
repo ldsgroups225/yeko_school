@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const selectedYear = ref('2024')
-
 const yearOptions = [
   { label: '2024', value: '2024' },
   { label: '2023', value: '2023' },
@@ -26,25 +25,29 @@ const columns = [
   { key: 'actions', label: 'Actions' },
 ]
 
-const sort = ref({
+const sort = ref<{ column: string, direction: 'asc' | 'desc' }>({
   column: 'name',
   direction: 'asc',
 })
 
-function onUpdateSort(newSort: { column: string, direction: string } | { column: string, direction: string }) {
+function onUpdateSort(newSort: { column: string, direction: 'asc' | 'desc' }) {
   sort.value = newSort
 }
 
-function getActionItems(row: { id: any }) {
+function logAction(action: string, row: { id: number }) {
+  console.log(action, row.id)
+}
+
+function getActionItems(row: { id: number }) {
   return [
     [{
       label: 'Edit',
       icon: 'i-heroicons-pencil-square-20-solid',
-      click: () => console.log('Edit', row.id),
+      click: () => logAction('Edit', row),
     }, {
       label: 'Delete',
       icon: 'i-heroicons-trash-20-solid',
-      click: () => console.log('Delete', row.id),
+      click: () => logAction('Delete', row),
     }],
   ]
 }
@@ -55,7 +58,6 @@ function getActionItems(row: { id: any }) {
     <h1 class="text-4xl font-bold mb-8 text-orange-600">
       Dashboard
     </h1>
-
     <!-- Feature Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
       <UCard v-for="(feature, index) in features" :key="index">
@@ -74,7 +76,6 @@ function getActionItems(row: { id: any }) {
         </div>
       </UCard>
     </div>
-
     <!-- Recent Students Table -->
     <UCard>
       <template #header>
@@ -82,10 +83,9 @@ function getActionItems(row: { id: any }) {
           <h2 class="text-2xl font-semibold text-orange-600">
             Recent Students
           </h2>
-          <UDropdown v-model="selectedYear" :items="yearOptions" />
+          <USelectMenu v-model="selectedYear" :options="yearOptions" />
         </div>
       </template>
-
       <UTable
         :columns="columns"
         :rows="recentStudents"

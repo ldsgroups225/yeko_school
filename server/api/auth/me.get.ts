@@ -92,6 +92,7 @@ async function fetchUserProfile(client: any, userId: string): Promise<IUserProfi
     fullName: `${profile.first_name ?? ''} ${profile.last_name ?? ''}`.trim(),
     phoneNumber: profile.phone ?? '',
     schoolId: profile.school_id ?? '',
+    avatar: profile.avatar_url ?? '',
   }
 }
 
@@ -141,6 +142,7 @@ function formatUserResponse(user: any, profile: IUserProfileDTOExeceptSchool, sc
       fullName: profile.fullName,
       phoneNumber: profile.phoneNumber,
       role: profile.role,
+      avatar: profile.avatar,
       school,
     },
   }

@@ -79,21 +79,26 @@ export interface IUserProfileDTO {
   role: string
   fullName?: string
   phoneNumber?: string
+  avatar?: string | null
   school: ISchoolDTO
 }
 
-export
-interface IStudentDTO {
+export interface IStudentDTO {
   id: string
   parentId: string
   schoolId: string | null
   classId: string | null
+  className: string | null
   idNumber: string
   firstName: string
   lastName: string
-  createdAt: string
+  dateOfBirth?: string | null
+  gender: 'M' | 'F'
+  address?: string | null
+  avatarUrl?: string | null
+  createdAt: string | null
   createdBy: string | null
-  updatedAt: string
+  updatedAt: string | null
   updatedBy: string | null
 }
 
@@ -104,4 +109,11 @@ export interface IStudentFiltersDTO {
   schoolId?: string
   ageMin?: number
   ageMax?: number
+}
+
+// TODO: remove this
+export interface Class {
+  name: string
+  count: number
+  subclasses: string[]
 }
