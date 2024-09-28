@@ -8,7 +8,7 @@ import type { ISchoolDTO, IUserProfileDTO } from '../../../types'
 import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
 import { ERole, roleToString } from '../../../types'
 
-type IUserProfileDTOExeceptSchool = Omit<IUserProfileDTO, 'school'> & { schoolId: string }
+type IUserProfileDTOExceptSchool = Omit<IUserProfileDTO, 'school'> & { schoolId: string }
 
 /**
  * Represents a user profile retrieved from the database.
@@ -28,6 +28,7 @@ type IUserProfileDTOExeceptSchool = Omit<IUserProfileDTO, 'school'> & { schoolId
  * @property {string} id - The school's unique identifier.
  * @property {string} name - The name of the school.
  * @property {string} code - The school's code.
+ * @property {string} cycle_id - The school's cycle.
  * @property {string|null} image_url - The URL of the school's image.
  * @property {string|null} created_at - The creation date of the school record.
  * @property {string|null} created_by - The ID of the user who created the school record.
@@ -51,6 +52,7 @@ type IUserProfileDTOExeceptSchool = Omit<IUserProfileDTO, 'school'> & { schoolId
  * @property {string} data.school.id - The school's unique identifier.
  * @property {string} data.school.name - The name of the school.
  * @property {string} data.school.code - The school's code.
+ * @property {string} data.school.cycleId - The school's cycle.
  * @property {string} data.school.imageUrl - The URL of the school's image.
  * @property {string} data.school.createdAt - The creation date of the school record.
  * @property {string} data.school.createdBy - The ID of the user who created the school record.
@@ -64,10 +66,10 @@ type IUserProfileDTOExeceptSchool = Omit<IUserProfileDTO, 'school'> & { schoolId
  * @function fetchUserProfile
  * @param {any} client - The Supabase client.
  * @param {string} userId - The ID of the user to fetch.
- * @returns {Promise<IUserProfileDTOExeceptSchool>} The user profile.
+ * @returns {Promise<IUserProfileDTOExceptSchool>} The user profile.
  * @throws {Error} If the profile is not found or there's a database error.
  */
-async function fetchUserProfile(client: any, userId: string): Promise<IUserProfileDTOExeceptSchool> {
+async function fetchUserProfile(client: any, userId: string): Promise<IUserProfileDTOExceptSchool> {
   const { data: profile, error } = await client
     .from('users')
     .select('id, email, first_name, last_name, phone, user_roles(role_id), school_id')
@@ -120,18 +122,28 @@ async function fetchSchool(client: any, schoolId: string): Promise<ISchoolDTO> {
     })
   }
 
-  return school
+  return {
+    id: school.id,
+    name: school.name,
+    code: school.code,
+    cycleId: school.cycle_id,
+    imageUrl: school.image_url ?? '',
+    createdAt: school.created_at ?? '',
+    createdBy: school.created_by ?? '',
+    updatedAt: school.updated_at ?? '',
+    updatedBy: school.updated_by ?? '',
+  } satisfies ISchoolDTO
 }
 
 /**
  * Formats the user response.
  * @function formatUserResponse
  * @param {any} user - The user object from Supabase auth.
- * @param {IUserProfileDTOExeceptSchool} profile - The user profile from the database.
+ * @param {IUserProfileDTOExceptSchool} profile - The user profile from the database.
  * @param {ISchoolDTO} school - The school data from the database.
  * @returns {{success: boolean, data: IUserProfileDTO}} The formatted user response.
  */
-function formatUserResponse(user: any, profile: IUserProfileDTOExeceptSchool, school: ISchoolDTO): { success: boolean, data: IUserProfileDTO } {
+function formatUserResponse(user: any, profile: IUserProfileDTOExceptSchool, school: ISchoolDTO): { success: boolean, data: IUserProfileDTO } {
   return {
     success: true,
     data: {

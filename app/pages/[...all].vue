@@ -1,4 +1,9 @@
 <script lang="ts" setup>
+definePageMeta({
+  layout: 'auth',
+  // middleware: ['guest'],
+})
+
 const router = useRouter()
 </script>
 

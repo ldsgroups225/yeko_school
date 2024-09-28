@@ -16,7 +16,7 @@ const loginSchema = z.object({
 
 // Error handling
 function throwI18nErrorBasedOnCode(code: string): never {
-  const errorMessages: Record<ErrorCode, { statusCode: number, message: string }> = {
+  const errorMessages: Record<any, { statusCode: number, message: string }> = {
     // General errors
     unexpected_failure: { statusCode: 500, message: 'Une erreur inattendue s\'est produite' },
     validation_failed: { statusCode: 400, message: 'La validation a échoué' },
@@ -142,7 +142,7 @@ export default defineEventHandler(async (event) => {
 
   if (error) {
     console.error('[E_SIGN_IN]', error)
-    throwI18nErrorBasedOnCode(error.code)
+    throwI18nErrorBasedOnCode(error.code ?? 'unexpected_failure')
   }
 
   return { success: true, data: data.user?.id }

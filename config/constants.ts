@@ -1,5 +1,8 @@
 // Application-wide constants
 
+import type { IGradeDTO } from '~~/types'
+import { ECycle } from '~~/types'
+
 // API endpoints
 export const API_BASE_URL = 'https://api.yekopointage.com'
 
@@ -42,3 +45,33 @@ export const ENABLE_BIOMETRIC_AUTH = false
 
 // Version
 export const APP_VERSION = '1.0.0'
+
+export const primaryGrades: IGradeDTO[] = [
+  { id: 1, name: 'CP1' },
+  { id: 2, name: 'CP2' },
+  { id: 3, name: 'CE1' },
+  { id: 4, name: 'CE2' },
+  { id: 5, name: 'CM1' },
+  { id: 6, name: 'CM2' },
+]
+
+export const secondaryGrades: IGradeDTO[] = [
+  { id: 7, name: '6e' },
+  { id: 8, name: '5e' },
+  { id: 9, name: '4e' },
+  { id: 10, name: '3e' },
+  { id: 11, name: '2nde' },
+  { id: 12, name: '1ere' },
+  { id: 13, name: 'Tle' },
+]
+
+export function getGradesByCycle(cycle: ECycle): IGradeDTO[] {
+  switch (cycle) {
+    case ECycle.PRIMARY:
+      return primaryGrades
+    case ECycle.SECONDARY:
+      return secondaryGrades
+    default:
+      throw new Error('Invalid cycle')
+  }
+}

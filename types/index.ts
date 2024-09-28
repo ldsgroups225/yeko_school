@@ -64,6 +64,7 @@ export interface ISchoolDTO {
   id: string
   name: string
   code: string
+  cycleId: string
   imageUrl: string
   createdAt: string
   createdBy: string
@@ -111,9 +112,28 @@ export interface IStudentFiltersDTO {
   ageMax?: number
 }
 
+export interface IClassDTO {
+  id?: string
+  name: string
+}
+
+export interface IGradeDTO {
+  id?: number
+  name: string
+}
+
 // TODO: remove this
 export interface Class {
+  id?: string
   name: string
   count: number
-  subclasses: string[]
+  subclasses: {
+    id: string
+    name: string
+  }[]
+}
+
+export enum ECycle {
+  PRIMARY = 'primary',
+  SECONDARY = 'secondary',
 }

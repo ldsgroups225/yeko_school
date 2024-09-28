@@ -2,11 +2,13 @@
 import { useUserStore } from '~/stores/userStore'
 
 definePageMeta({
+  layout: 'auth',
   // middleware: ['guest'],
 })
 
 const { t } = useI18n()
 const userStore = useUserStore()
+const { isAuthenticated } = storeToRefs(userStore)
 
 const fields = [
   {
@@ -47,8 +49,8 @@ function validatePassword(password?: string) {
   return null
 }
 
-function validate(state) {
-  const errors: FormError[] = []
+function validate(state: { email: string | undefined, password: string | undefined }) {
+  const errors = []
   const emailError = validateEmail(state.email)
   const passwordError = validatePassword(state.password)
 
@@ -59,15 +61,6 @@ function validate(state) {
   return errors
 }
 
-const providers = [{
-  label: t('continueWithGitHub'),
-  icon: 'i-simple-icons-github',
-  color: 'white' as const,
-  click: () => {
-    console.log('Redirect to GitHub')
-  },
-}]
-
 async function onSubmit(data: any) {
   try {
     await userStore.login({
@@ -76,7 +69,7 @@ async function onSubmit(data: any) {
       rememberMe: data.remember,
     })
 
-    if (userStore.isAuthenticated) {
+    if (isAuthenticated?.value) {
       // Redirect to dashboard or home page
       navigateTo('/dashboard')
     }
@@ -92,7 +85,6 @@ async function onSubmit(data: any) {
     <UCard class="max-w-sm w-full">
       <UAuthForm
         :fields="fields"
-        :providers="providers"
         :title="t('welcomeBack')"
         :ui="{ base: 'text-center', footer: 'text-center' }"
         :validate="validate"
@@ -114,7 +106,7 @@ async function onSubmit(data: any) {
           </NuxtLink>
         </template>
         <template #validation>
-          <UAlert v-if="userStore.error" :title="t('errorSigningIn')" color="red" icon="i-heroicons-information-circle-20-solid">
+          <UAlert v-if="userStore.error" :title="userStore.error" color="red" icon="i-heroicons-information-circle-20-solid">
             {{ userStore.error }}
           </UAlert>
         </template>

@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import type { IStudentDTO } from '~~/types'
 import { formatDate, getAge } from '~~/utils/dateTime.js'
-import { CLASSES, COLUMNS, YEAR_OPTIONS } from '~/constants'
+import { STUDENT_COLUMNS, YEAR_OPTIONS } from '~/constants'
 
 // Store
+const { userData } = useUserStore()
 const studentStore = useStudentStore()
 const { students, isLoading, error } = storeToRefs(studentStore)
 
 // State
+const { data: classes, status: classFetchingStatus } = useFetch('/api/classes/classes_grouped_by_grade', { params: { schoolId: userData?.school?.id } })
 const selectedYear = ref('2024 2025')
-const selectedColumns = ref(COLUMNS)
+const selectedColumns = ref(STUDENT_COLUMNS)
 
 // Composables
 const {
@@ -23,35 +25,10 @@ const {
   pageTo,
   onPageChange,
   selectRow,
-} = useTableState<IStudentDTO>(students)
-
-const {
   searchTerm,
   selectedClasses,
-  filteredData,
   resetFilters,
-} = useFilters<IStudentDTO>(students)
-
-// Computed
-const sortedStudents = computed(() => {
-  return [...filteredData.value].sort((a, b) => {
-    const column = sort.value.column
-    const aValue = a[column]
-    const bValue = b[column]
-
-    if (typeof aValue === 'string' && typeof bValue === 'string') {
-      return sort.value.direction === 'asc'
-        ? aValue.localeCompare(bValue)
-        : bValue.localeCompare(aValue)
-    }
-    else if (typeof aValue === 'number' && typeof bValue === 'number') {
-      return sort.value.direction === 'asc'
-        ? aValue - bValue
-        : bValue - aValue
-    }
-    return 0
-  })
-})
+} = useTableState<IStudentDTO>(students)
 
 // Methods
 function getActionItems(row: { id: string }) {
@@ -68,20 +45,27 @@ function getActionItems(row: { id: string }) {
   ]
 }
 
-function getDropdownItems(subclasses: string[]) {
+function getDropdownItems(subclasses: { label: string, value: string }[]) {
   return subclasses.map(subclass => ({
-    label: subclass,
-    onClick: () => {
-      if (selectedClasses.value.includes(subclass)) {
-        selectedClasses.value = selectedClasses.value.filter(c => c !== subclass)
+    label: selectedClasses.value.includes(subclass.value) ? `${subclass.label} ✔️` : `${subclass.label}`,
+    click: () => {
+      if (selectedClasses.value.includes(subclass.value)) {
+        selectedClasses.value = selectedClasses.value.filter(c => c !== subclass.value)
       }
       else {
-        selectedClasses.value.push(subclass)
+        selectedClasses.value.push(subclass.value)
       }
     },
-    selected: selectedClasses.value.includes(subclass),
+    selected: selectedClasses.value.includes(subclass.value),
   }))
 }
+
+// Computed
+const gradeHasSelectedSubclass = computed(() => {
+  return (grade: { subclasses: { id: string }[] }) => {
+    return grade.subclasses.some(subclass => selectedClasses.value.includes(subclass.id))
+  }
+})
 
 // Lifecycle
 onMounted(async () => {
@@ -119,13 +103,18 @@ onMounted(async () => {
         <UInput v-model="searchTerm" icon="i-heroicons-magnifying-glass-20-solid" placeholder="Rechercher un étudiant..." />
         <div class="flex flex-wrap gap-2">
           <UDropdown
-            v-for="cls in CLASSES"
+            v-for="cls in classes?.data"
             :key="cls.name"
-            :items="[getDropdownItems(cls.subclasses)]"
+            :items="[getDropdownItems(cls.subclasses.map(s => ({ label: s.name, value: s.id })))]"
           >
-            <UButton variant="outline">
+            <UButton variant="outline" class="flex items-center">
               {{ cls.name }}
               <UIcon name="i-heroicons-chevron-down" class="ml-2 h-4 w-4" />
+              <UIcon
+                v-if="gradeHasSelectedSubclass(cls)"
+                name="i-heroicons-eye-20-solid"
+                class="ml-1 h-4 w-4 text-green-700 dark:text-green-400"
+              />
             </UButton>
           </UDropdown>
         </div>
@@ -153,7 +142,7 @@ onMounted(async () => {
               Actions groupées
             </UButton>
           </UDropdown>
-          <USelectMenu v-model="selectedColumns" :options="COLUMNS" multiple>
+          <USelectMenu v-model="selectedColumns" :options="STUDENT_COLUMNS" multiple>
             <UButton
               icon="i-heroicons-view-columns"
               color="gray"
@@ -180,7 +169,7 @@ onMounted(async () => {
         v-model:sort="sort"
         :rows="paginatedData"
         :columns="selectedColumns"
-        :loading="isLoading"
+        :loading="isLoading || classFetchingStatus === 'pending'"
         sort-asc-icon="i-heroicons-arrow-up"
         sort-desc-icon="i-heroicons-arrow-down"
         :ui="{
@@ -215,7 +204,7 @@ onMounted(async () => {
               à
               <span class="font-medium">{{ pageTo }}</span>
               sur
-              <span class="font-medium">{{ filteredData.length }}</span>
+              <span class="font-medium">{{ paginatedData.length }}</span>
               résultats
             </span>
           </div>
