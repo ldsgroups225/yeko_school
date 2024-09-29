@@ -22,6 +22,17 @@ interface StudentState {
 }
 
 /**
+ * @interface LinkStudentParentData
+ * @description Represents the data needed to link a student and parent.
+ */
+interface LinkStudentParentData {
+  /** @property {string} studentId - The ID of the student to be linked. */
+  studentId: string
+  /** @property {string} otp - The one-time password for linking. */
+  otp: string
+}
+
+/**
  * @constant
  * @name useStudentStore
  * @type {Store<'student', StudentState>}
@@ -163,6 +174,48 @@ export const useStudentStore = defineStore('student', {
       }
 
       this.isLoading = pending.value
+    },
+
+    /**
+     * @async
+     * @function linkStudentAndParent
+     * @description Links a student to a parent using the provided OTP.
+     * @param {LinkStudentParentData} linkData - The data for linking student and parent.
+     * @returns {Promise<boolean>} A promise that resolves to true if linking was successful, false otherwise.
+     */
+    async linkStudentAndParent(linkData: LinkStudentParentData) {
+      this.isLoading = true
+      this.error = null
+
+      try {
+        const { success, message } = await $fetch<{ success: boolean, message: any }>('/api/students/link-student-and-parent', {
+          method: 'PATCH',
+          body: linkData,
+        })
+
+        if (!success) {
+          this.error = message.message || 'An error occurred while linking student and parent'
+          return false
+        }
+
+        if (success) {
+          // If the linking was successful, we might want to refresh the student data
+          await this.fetchStudentById(linkData.studentId)
+          return true
+        }
+        else {
+          this.error = message.message || 'Failed to link student and parent'
+          return false
+        }
+      }
+      catch (e) {
+        const _e = e
+        this.error = 'An unexpected error occurred'
+        return false
+      }
+      finally {
+        this.isLoading = false
+      }
     },
 
     /**

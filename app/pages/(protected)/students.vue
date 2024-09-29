@@ -13,6 +13,10 @@ const { data: classes, status: classFetchingStatus } = useFetch('/api/classes/cl
 const selectedYear = ref('2024 2025')
 const selectedColumns = ref(STUDENT_COLUMNS)
 
+// Modal state
+const isLinkModalOpen = ref(false)
+const selectedStudentForLink = ref<{ id: string, name: string } | null>(null)
+
 // Composables
 const {
   currentPage,
@@ -31,17 +35,28 @@ const {
 } = useTableState<IStudentDTO>(students)
 
 // Methods
-function getActionItems(row: { id: string }) {
+function getActionItems(row: IStudentDTO) {
   return [
-    [{
-      label: 'Modifier',
-      icon: 'i-heroicons-pencil-square-20-solid',
-      click: () => studentStore.fetchStudentById(row.id),
-    }, {
-      label: 'Voir',
-      icon: 'i-heroicons-eye-20-solid',
-      click: () => studentStore.fetchStudentById(row.id),
-    }],
+    [
+      {
+        label: 'Voir',
+        icon: 'i-heroicons-eye-20-solid',
+        click: () => studentStore.fetchStudentById(row.id),
+      },
+      {
+        label: 'Modifier',
+        icon: 'i-heroicons-pencil-square-20-solid',
+        click: () => studentStore.fetchStudentById(row.id),
+      },
+      {
+        label: 'Lier à son parent',
+        icon: 'i-heroicons-link-20-solid',
+        click: () => {
+          selectedStudentForLink.value = { id: row.id, name: `${row.firstName} ${row.lastName}` }
+          isLinkModalOpen.value = true
+        },
+      },
+    ],
   ]
 }
 
@@ -75,7 +90,7 @@ onMounted(async () => {
 
 <template>
   <div class="space-y-6 p-6">
-    <UAlert v-if="error" color="red" icon="i-heroicons-exclamation-triangle" :title="error" />
+    <UAlert v-if="error && !isLinkModalOpen" color="red" icon="i-heroicons-exclamation-triangle" :title="error" />
 
     <UCard
       :ui="{
@@ -228,5 +243,14 @@ onMounted(async () => {
         </div>
       </template>
     </UCard>
+
+    <UModal v-model="isLinkModalOpen">
+      <LinkStudentParentModal
+        v-if="selectedStudentForLink"
+        :student-id="selectedStudentForLink.id"
+        :student-name="selectedStudentForLink.name"
+        @close="isLinkModalOpen = false"
+      />
+    </UModal>
   </div>
 </template>
