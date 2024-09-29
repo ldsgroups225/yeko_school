@@ -1,20 +1,41 @@
 import { serverSupabaseClient } from '#supabase/server'
 import { z } from 'zod'
 
+/**
+ * Represents the structure of the login form data.
+ */
 interface LoginFormData {
+  /** The user's email address. */
   email: string
+  /** The user's password. */
   password: string
+  /** Optional flag to remember the user's session. */
   rememberMe?: boolean
 }
 
-// Schemas
+/**
+ * Zod schema for validating login form data.
+ */
 const loginSchema = z.object({
   email: z.string().email({ message: 'L\'email est invalide' }),
   password: z.string().min(6, { message: 'Le mot de passe doit contenir au moins 6 caractères' }),
   rememberMe: z.boolean().optional(),
 })
 
-// Error handling
+/**
+ * Throws an H3Error with a localized message based on the provided error code.
+ *
+ * @param {string} code - The error code to look up.
+ * @throws {H3Error} An H3 error object with the appropriate status code and localized message.
+ *
+ * @example
+ * try {
+ *   throwI18nErrorBasedOnCode('invalid_credentials');
+ * } catch (error) {
+ *   console.error(error.statusCode, error.message);
+ *   // Output: 400 "Email ou mot de passe incorrect"
+ * }
+ */
 function throwI18nErrorBasedOnCode(code: string): never {
   const errorMessages: Record<any, { statusCode: number, message: string }> = {
     // General errors
@@ -117,7 +138,22 @@ function throwI18nErrorBasedOnCode(code: string): never {
   throw createError(error)
 }
 
-// Validation
+/**
+ * Validates and parses the login form data using the Zod schema.
+ *
+ * @param {unknown} formData - The raw form data to be validated.
+ * @returns {Promise<LoginFormData>} A promise that resolves to the validated and parsed login form data.
+ * @throws {H3Error} If the validation fails, an error is thrown with details about the validation failure.
+ *
+ * @example
+ * const rawFormData = { email: "user@example.com", password: "password123" };
+ * try {
+ *   const validatedData = await validateAndParseFormData(rawFormData);
+ *   console.log(validatedData);
+ * } catch (error) {
+ *   console.error(error.statusCode, error.message);
+ * }
+ */
 async function validateAndParseFormData(formData: unknown): Promise<LoginFormData> {
   const result = loginSchema.safeParse(formData)
 
@@ -132,7 +168,30 @@ async function validateAndParseFormData(formData: unknown): Promise<LoginFormDat
   return result.data
 }
 
-// Main handler
+/**
+ * Main event handler for user login.
+ *
+ * This function validates the incoming form data, attempts to sign in the user
+ * using Supabase authentication, and returns the user ID on success.
+ *
+ * @param {H3Event} event - The H3 event object containing the request details.
+ * @returns {Promise<{ success: boolean; data: string | undefined }>} A promise that resolves to an object containing:
+ *   - success: A boolean indicating whether the login was successful.
+ *   - data: The user ID if login was successful, undefined otherwise.
+ * @throws {H3Error} If there's an error during the login process, including validation errors or authentication failures.
+ *
+ * @example
+ * // Assuming this is used in a Nuxt 3 API route
+ * export default defineEventHandler(async (event) => {
+ *   try {
+ *     const result = await loginHandler(event);
+ *     return result;
+ *   } catch (error) {
+ *     console.error(error);
+ *     return { success: false, error: error.message };
+ *   }
+ * });
+ */
 export default defineEventHandler(async (event) => {
   const formData = await readBody(event)
   const { email, password } = await validateAndParseFormData(formData)

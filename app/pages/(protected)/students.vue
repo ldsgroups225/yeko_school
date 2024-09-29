@@ -75,6 +75,8 @@ onMounted(async () => {
 
 <template>
   <div class="space-y-6 p-6">
+    <UAlert v-if="error" color="red" icon="i-heroicons-exclamation-triangle" :title="error" />
+
     <UCard
       :ui="{
         base: '',
@@ -226,7 +228,5 @@ onMounted(async () => {
         </div>
       </template>
     </UCard>
-
-    <UAlert v-if="error" color="red" icon="i-heroicons-exclamation-triangle" :title="error" />
   </div>
 </template>

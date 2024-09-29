@@ -8,6 +8,10 @@ import type { ISchoolDTO, IUserProfileDTO } from '../../../types'
 import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
 import { ERole, roleToString } from '../../../types'
 
+/**
+ * Represents a user profile without the school property, but with a schoolId.
+ * @typedef {Omit<IUserProfileDTO, 'school'> & { schoolId: string }} IUserProfileDTOExceptSchool
+ */
 type IUserProfileDTOExceptSchool = Omit<IUserProfileDTO, 'school'> & { schoolId: string }
 
 /**
@@ -48,16 +52,8 @@ type IUserProfileDTOExceptSchool = Omit<IUserProfileDTO, 'school'> & { schoolId:
  * @property {string} data.fullName - The user's full name.
  * @property {string} data.phoneNumber - The user's phone number.
  * @property {string} data.role - The user's role.
- * @property {object} data.school - The user's associated school.
- * @property {string} data.school.id - The school's unique identifier.
- * @property {string} data.school.name - The name of the school.
- * @property {string} data.school.code - The school's code.
- * @property {string} data.school.cycleId - The school's cycle.
- * @property {string} data.school.imageUrl - The URL of the school's image.
- * @property {string} data.school.createdAt - The creation date of the school record.
- * @property {string} data.school.createdBy - The ID of the user who created the school record.
- * @property {string} data.school.updatedAt - The last update date of the school record.
- * @property {string} data.school.updatedBy - The ID of the user who last updated the school record.
+ * @property {string} data.avatar - The user's avatar URL.
+ * @property {ISchoolDTO} data.school - The user's associated school.
  */
 
 /**
@@ -67,7 +63,15 @@ type IUserProfileDTOExceptSchool = Omit<IUserProfileDTO, 'school'> & { schoolId:
  * @param {any} client - The Supabase client.
  * @param {string} userId - The ID of the user to fetch.
  * @returns {Promise<IUserProfileDTOExceptSchool>} The user profile.
- * @throws {Error} If the profile is not found or there's a database error.
+ * @throws {H3Error} If the profile is not found or there's a database error.
+ *
+ * @example
+ * try {
+ *   const profile = await fetchUserProfile(supabaseClient, 'user-123');
+ *   console.log(profile);
+ * } catch (error) {
+ *   console.error(error);
+ * }
  */
 async function fetchUserProfile(client: any, userId: string): Promise<IUserProfileDTOExceptSchool> {
   const { data: profile, error } = await client
@@ -104,8 +108,16 @@ async function fetchUserProfile(client: any, userId: string): Promise<IUserProfi
  * @function fetchSchool
  * @param {any} client - The Supabase client.
  * @param {string} schoolId - The ID of the school to fetch.
- * @returns {Promise<School>} The school data.
- * @throws {Error} If the school is not found or there's a database error.
+ * @returns {Promise<ISchoolDTO>} The school data.
+ * @throws {H3Error} If the school is not found or there's a database error.
+ *
+ * @example
+ * try {
+ *   const school = await fetchSchool(supabaseClient, 'school-456');
+ *   console.log(school);
+ * } catch (error) {
+ *   console.error(error);
+ * }
  */
 async function fetchSchool(client: any, schoolId: string): Promise<ISchoolDTO> {
   const { data: school, error } = await client
@@ -142,6 +154,13 @@ async function fetchSchool(client: any, schoolId: string): Promise<ISchoolDTO> {
  * @param {IUserProfileDTOExceptSchool} profile - The user profile from the database.
  * @param {ISchoolDTO} school - The school data from the database.
  * @returns {{success: boolean, data: IUserProfileDTO}} The formatted user response.
+ *
+ * @example
+ * const user = { id: 'user-123', email: 'user@example.com' };
+ * const profile = { id: 'user-123', firstName: 'John', lastName: 'Doe', ... };
+ * const school = { id: 'school-456', name: 'Example School', ... };
+ * const response = formatUserResponse(user, profile, school);
+ * console.log(response);
  */
 function formatUserResponse(user: any, profile: IUserProfileDTOExceptSchool, school: ISchoolDTO): { success: boolean, data: IUserProfileDTO } {
   return {
@@ -162,11 +181,25 @@ function formatUserResponse(user: any, profile: IUserProfileDTOExceptSchool, sch
 
 /**
  * The main handler for the /api/auth/me endpoint.
+ * Fetches and formats the authenticated user's data.
+ *
  * @async
  * @function
  * @param {H3Event} event - The H3 event object.
  * @returns {Promise<UserResponse>} The user data response.
- * @throws {Error} If the user is not authenticated or if there's an error fetching data.
+ * @throws {H3Error} If the user is not authenticated or if there's an error fetching data.
+ *
+ * @example
+ * // Assuming this is used in a Nuxt 3 API route
+ * export default defineEventHandler(async (event) => {
+ *   try {
+ *     const userResponse = await authMeHandler(event);
+ *     return userResponse;
+ *   } catch (error) {
+ *     console.error(error);
+ *     return { success: false, error: error.message };
+ *   }
+ * });
  */
 export default defineEventHandler(async (event) => {
   const user = await serverSupabaseUser(event)

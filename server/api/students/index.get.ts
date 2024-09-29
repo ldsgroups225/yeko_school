@@ -1,9 +1,10 @@
+import type { Database } from '~~/types/database.types'
 import type { IStudentDTO } from '../../../types'
 import { serverSupabaseClient } from '#supabase/server'
 import { z } from 'zod'
 
 /**
- * Schema for validating query parameters
+ * Zod schema for validating query parameters.
  */
 const querySchema = z.object({
   name: z.string().optional(),
@@ -15,15 +16,16 @@ const querySchema = z.object({
 })
 
 /**
- * Type for the validated query parameters
+ * Type definition for the validated query parameters.
  */
 type ValidatedQueryParams = z.infer<typeof querySchema>
 
 /**
- * Throws an error with a specified message and status code
- * @param {string} message - The error message
- * @param {number} statusCode - The HTTP status code (default: 400)
- * @throws {H3Error} - An H3 error object
+ * Throws an H3Error with a specified message and status code.
+ *
+ * @param {string} message - The error message to be displayed.
+ * @param {number} [statusCode] - The HTTP status code for the error (default is 400).
+ * @throws {H3Error} An H3 error object with the specified message and status code.
  */
 function throwI18nError(message: string, statusCode: number = 400): never {
   throw createError({
@@ -33,10 +35,16 @@ function throwI18nError(message: string, statusCode: number = 400): never {
 }
 
 /**
- * Validates and parses the query parameters
- * @param {unknown} query - The raw query object
- * @returns {Promise<ValidatedQueryParams>} - The validated and parsed query parameters
- * @throws {H3Error} - If validation fails
+ * Validates and parses the query parameters using the Zod schema.
+ *
+ * @param {unknown} query - The raw query object to be validated.
+ * @returns {Promise<ValidatedQueryParams>} A promise that resolves to the validated and parsed query parameters.
+ * @throws {H3Error} If the validation fails, an error is thrown with details about the validation failure.
+ *
+ * @example
+ * const rawQuery = { name: "John", ageMin: "18" };
+ * const validatedQuery = await validateAndParseQueryParams(rawQuery);
+ * console.log(validatedQuery); // { name: "John", ageMin: 18 }
  */
 async function validateAndParseQueryParams(query: unknown): Promise<ValidatedQueryParams> {
   const result = querySchema.safeParse(query)
@@ -48,10 +56,17 @@ async function validateAndParseQueryParams(query: unknown): Promise<ValidatedQue
 }
 
 /**
- * Builds the Supabase query based on the provided filters
- * @param {SupabaseClient} client - The Supabase client
- * @param {ValidatedQueryParams} query - The validated query parameters
- * @returns {SupabaseClient['from']['select']} - The built Supabase query
+ * Builds a Supabase query based on the provided filters.
+ *
+ * @param {SupabaseClient} client - The Supabase client instance.
+ * @param {ValidatedQueryParams} query - The validated query parameters to filter the students.
+ * @returns {SupabaseClient['from']['select']} A Supabase query object with applied filters.
+ *
+ * @example
+ * const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+ * const query = { name: "Smith", ageMin: 18 };
+ * const supabaseQuery = buildSupabaseQuery(supabase, query);
+ * const { data, error } = await supabaseQuery;
  */
 function buildSupabaseQuery(client: any, query: ValidatedQueryParams) {
   let supabaseQuery = client
@@ -88,13 +103,31 @@ function buildSupabaseQuery(client: any, query: ValidatedQueryParams) {
 }
 
 /**
- * Main event handler for fetching students
- * @param {H3Event} event - The H3 event object
- * @returns {Promise<{ success: boolean; data: IStudentDTO[] }>} - The response object with fetched students
- * @throws {H3Error} - If an error occurs during the process
+ * Main event handler for fetching students based on query parameters.
+ *
+ * This function validates the incoming query, builds a Supabase query,
+ * fetches the students data, and returns the parsed results.
+ *
+ * @param {H3Event} event - The H3 event object containing the request details.
+ * @returns {Promise<{ success: boolean; data: IStudentDTO[] }>} A promise that resolves to an object containing:
+ *   - success: A boolean indicating whether the operation was successful.
+ *   - data: An array of parsed student DTOs.
+ * @throws {H3Error} If there's an error during the process of fetching or parsing the students data.
+ *
+ * @example
+ * // Assuming this is used in a Nuxt 3 API route
+ * export default defineEventHandler(async (event) => {
+ *   try {
+ *     const result = await fetchStudents(event);
+ *     return result;
+ *   } catch (error) {
+ *     console.error(error);
+ *     return { success: false, error: error.message };
+ *   }
+ * });
  */
 export default defineEventHandler(async (event) => {
-  const client = await serverSupabaseClient(event)
+  const client = await serverSupabaseClient<Database>(event)
   const rawQuery = getQuery(event)
 
   // Validate and parse query parameters
