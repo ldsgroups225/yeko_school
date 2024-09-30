@@ -3,7 +3,7 @@
  * @description Defines and exports the student store for managing student data and operations.
  */
 
-import type { IStudentDTO, IStudentFiltersDTO } from '~~/types'
+import type { IStudentDTO, IStudentEditingDTO, IStudentFiltersDTO } from '~~/types'
 import { defineStore } from 'pinia'
 
 /**
@@ -123,31 +123,46 @@ export const useStudentStore = defineStore('student', {
      * @param {string} id - The ID of the student to update.
      * @param {Partial<IStudentDTO>} studentData - The data to update for the student.
      */
-    async updateStudent(id: string, studentData: Partial<IStudentDTO>) {
+    async updateStudent(id: string, studentData: Partial<IStudentEditingDTO>) {
       this.isLoading = true
       this.error = null
 
-      const { data, status, error } = await useFetch<{ success: boolean, data: IStudentDTO }>(`/api/students/${id}`, {
-        method: 'PUT',
-        body: studentData,
-      })
+      try {
+        const { success, message, data: updatedStudent } = await $fetch<{ success: boolean, message: any, data: IStudentDTO }>(`/api/students/${id}`, {
+          method: 'PATCH',
+          body: studentData,
+        })
 
-      if (error.value) {
-        this.error = error.value.message || `An error occurred while updating student with ID ${id}`
-        console.error('Error updating student:', error.value)
-      }
-      else if (data.value && data.value.success) {
-        const updatedStudent = data.value.data
-        const index = this.students.findIndex(s => s.id === id)
-        if (index !== -1) {
-          this.students[index] = updatedStudent
+        if (!success) {
+          this.error = message.message || 'An error occurred while linking student and parent'
+          return false
         }
-        if (this.currentStudent && this.currentStudent.id === id) {
-          this.currentStudent = updatedStudent
-        }
-      }
 
-      this.isLoading = status.value === 'pending'
+        if (success) {
+          // If the linking was successful, we might want to refresh the student data
+          const index = this.students.findIndex(s => s.id === id)
+          if (index !== -1) {
+            this.students[index] = updatedStudent
+          }
+          if (this.currentStudent && this.currentStudent.id === id) {
+            this.currentStudent = updatedStudent
+          }
+
+          return true
+        }
+        else {
+          this.error = message.message || 'Failed to link student and parent'
+          return false
+        }
+      }
+      catch (e) {
+        const _e = e
+        this.error = 'An unexpected error occurred'
+        return false
+      }
+      finally {
+        this.isLoading = false
+      }
     },
 
     /**

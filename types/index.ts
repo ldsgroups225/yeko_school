@@ -103,6 +103,16 @@ export interface IStudentDTO {
   updatedBy: string | null
 }
 
+export interface IStudentEditingDTO {
+  firstName?: string
+  lastName?: string
+  dateOfBirth?: string
+  gender: 'M' | 'F'
+  address?: string
+  avatarUrl?: string
+  avatarBase64?: string
+}
+
 export interface IStudentFiltersDTO {
   name?: string
   idNumber?: string

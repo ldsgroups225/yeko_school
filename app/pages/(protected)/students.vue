@@ -15,7 +15,9 @@ const selectedColumns = ref(STUDENT_COLUMNS)
 
 // Modal state
 const isLinkModalOpen = ref(false)
+const isUpdateModalOpen = ref(false)
 const selectedStudentForLink = ref<{ id: string, name: string } | null>(null)
+const selectedStudentForUpdate = ref<IStudentDTO | null>(null)
 
 // Composables
 const {
@@ -46,7 +48,10 @@ function getActionItems(row: IStudentDTO) {
       {
         label: 'Modifier',
         icon: 'i-heroicons-pencil-square-20-solid',
-        click: () => studentStore.fetchStudentById(row.id),
+        click: () => {
+          selectedStudentForUpdate.value = row
+          isUpdateModalOpen.value = true
+        },
       },
       {
         label: 'Lier à son parent',
@@ -250,6 +255,14 @@ onMounted(async () => {
         :student-id="selectedStudentForLink.id"
         :student-name="selectedStudentForLink.name"
         @close="isLinkModalOpen = false"
+      />
+    </UModal>
+
+    <UModal v-model="isUpdateModalOpen">
+      <UpdateStudentModal
+        v-if="selectedStudentForUpdate"
+        :student="selectedStudentForUpdate"
+        @close="isUpdateModalOpen = false"
       />
     </UModal>
   </div>

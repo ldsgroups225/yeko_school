@@ -321,6 +321,61 @@ export interface Database {
           },
         ]
       }
+      link_student_parent: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          expired_at: string
+          id: string
+          is_used: boolean
+          otp: string
+          parent_id: string
+          student_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          expired_at?: string
+          id?: string
+          is_used?: boolean
+          otp: string
+          parent_id: string
+          student_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          expired_at?: string
+          id?: string
+          is_used?: boolean
+          otp?: string
+          parent_id?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'link_student_parent_created_by_fkey'
+            columns: ['created_by']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'link_student_parent_parent_id_fkey'
+            columns: ['parent_id']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'link_student_parent_student_id_fkey'
+            columns: ['student_id']
+            isOneToOne: false
+            referencedRelation: 'students'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       notes: {
         Row: {
           class_id: string
@@ -727,10 +782,14 @@ export interface Database {
       }
       students: {
         Row: {
+          address: string | null
+          avatar_url: string | null
           class_id: string | null
           created_at: string | null
           created_by: string | null
+          date_of_birth: string | null
           first_name: string
+          gender: string | null
           id: string
           id_number: string
           last_name: string
@@ -740,10 +799,14 @@ export interface Database {
           updated_by: string | null
         }
         Insert: {
+          address?: string | null
+          avatar_url?: string | null
           class_id?: string | null
           created_at?: string | null
           created_by?: string | null
+          date_of_birth?: string | null
           first_name: string
+          gender?: string | null
           id?: string
           id_number: string
           last_name: string
@@ -753,10 +816,14 @@ export interface Database {
           updated_by?: string | null
         }
         Update: {
+          address?: string | null
+          avatar_url?: string | null
           class_id?: string | null
           created_at?: string | null
           created_by?: string | null
+          date_of_birth?: string | null
           first_name?: string
+          gender?: string | null
           id?: string
           id_number?: string
           last_name?: string
@@ -1101,6 +1168,16 @@ export interface Database {
           homework?: Json
         }
         Returns: string
+      }
+      get_classes_by_school: {
+        Args: {
+          school_id: string
+        }
+        Returns: {
+          grade_name: string
+          count: number
+          subclasses: Json[]
+        }[]
       }
       get_group_label: {
         Args: {
