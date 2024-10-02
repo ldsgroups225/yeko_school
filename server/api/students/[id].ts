@@ -6,29 +6,10 @@
 
 import type { ClientType } from '~~/server/utils'
 import type { IStudentDTO } from '~~/types'
-import { serverSupabaseClient } from '#supabase/server'
+import type { IEditingStudentDTO } from '~~/utils/validators'
 import { csServerSupabaseClient } from '~~/server/utils'
 import { convertCase } from '~~/utils/caseConverter'
-import { z } from 'zod'
-
-/**
- * Zod schema for validating the request body.
- */
-const updateStudentSchema = z.object({
-  firstName: z.string().min(2, 'Le prénom ne peut pas être vide').max(50, 'Le prénom doit faire moins de 50 caractères').optional(),
-  lastName: z.string().min(2, 'Le nom ne peut pas être vide').max(50, 'Le nom doit faire moins de 50 caractères').optional(),
-  gender: z.enum(['M', 'F'], { message: 'Le genre doit être "Masculin" ou "Féminin"' }).optional(),
-  address: z.string().optional(),
-  avatarUrl: z.string().url('L\'URL de l\'avatar n\'est pas valide').optional(),
-  avatarBase64: z.string().optional(),
-}).refine(data => Object.keys(data).length > 0, {
-  message: 'Il faut au moins un champ à mettre à jour',
-})
-
-/**
- * Represents the structure of the update request data.
- */
-type UpdateStudentData = z.infer<typeof updateStudentSchema>
+import { updateStudentSchema } from '~~/utils/validators'
 
 /**
  * Validates the student ID from the route parameter.
@@ -63,10 +44,10 @@ function validateStudentId(id: string | undefined): string {
  * @async
  * @function validateAndParseData
  * @param {unknown} data - The raw request body data to be validated.
- * @returns {Promise<UpdateStudentData>} A promise that resolves to the validated and parsed data.
+ * @returns {Promise<IEditingStudentDTO>} A promise that resolves to the validated and parsed data.
  * @throws {H3Error} If the validation fails, an error is thrown with details about the validation failure.
  */
-async function validateAndParseData(data: any): Promise<UpdateStudentData> {
+async function validateAndParseData(data: any): Promise<IEditingStudentDTO> {
   if (data.avatarUrl === '')
     delete data.avatarUrl
   const result = updateStudentSchema.safeParse(data)
@@ -89,10 +70,10 @@ async function validateAndParseData(data: any): Promise<UpdateStudentData> {
  * @function updateStudent
  * @param {any} client - The Supabase client.
  * @param {string} id - The ID of the student to update.
- * @param {UpdateStudentData} data - The data to update for the student.
+ * @param {IEditingStudentDTO} data - The data to update for the student.
  * @throws {H3Error} If there's an error updating the student record.
  */
-async function updateStudent(client: ClientType, id: string, data: UpdateStudentData) {
+async function updateStudent(client: ClientType, id: string, data: IEditingStudentDTO) {
   let newAvatarUrl = data.avatarUrl
 
   if (data.avatarBase64) {

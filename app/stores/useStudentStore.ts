@@ -3,7 +3,8 @@
  * @description Defines and exports the student store for managing student data and operations.
  */
 
-import type { IStudentDTO, IStudentEditingDTO, IStudentFiltersDTO } from '~~/types'
+import type { IStudentDTO, IStudentFiltersDTO } from '~~/types'
+import type { IEditingStudentDTO } from '~~/utils/validators'
 import { defineStore } from 'pinia'
 
 /**
@@ -123,7 +124,7 @@ export const useStudentStore = defineStore('student', {
      * @param {string} id - The ID of the student to update.
      * @param {Partial<IStudentDTO>} studentData - The data to update for the student.
      */
-    async updateStudent(id: string, studentData: Partial<IStudentEditingDTO>) {
+    async updateStudent(id: string, studentData: Partial<IEditingStudentDTO>) {
       this.isLoading = true
       this.error = null
 

@@ -1,22 +1,16 @@
-import { AttendanceStatus } from "@/types";
+import { z } from 'zod'
 
-export function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
+export const updateStudentSchema = z.object({
+  firstName: z.string().min(2, 'Le prénom ne peut pas être vide').max(50, 'Le prénom doit faire moins de 50 caractères').optional(),
+  lastName: z.string().min(2, 'Le nom ne peut pas être vide').max(50, 'Le nom doit faire moins de 50 caractères').optional(),
+  gender: z.enum(['M', 'F'], { message: 'Le genre doit être "Masculin" ou "Féminin"' }).optional(),
+  classId: z.string().uuid('Cette classe n\'existe pas').nullish(),
+  schoolId: z.string().uuid('Cette école n\'existe pas').nullish(),
+  address: z.string().optional(),
+  avatarUrl: z.string().optional(),
+  avatarBase64: z.string().optional(),
+}).refine(data => Object.values(data).some(value => value !== undefined), {
+  message: 'Il faut au moins un champ à mettre à jour',
+})
 
-export function isValidPassword(password: string): boolean {
-  // At least 8 characters, 1 uppercase, 1 lowercase, 1 number
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
-  return passwordRegex.test(password);
-}
-
-export function isValidAttendanceStatus(
-  status: string,
-): status is AttendanceStatus {
-  return ["present", "absent", "late"].includes(status);
-}
-
-export function isValidName(name: string): boolean {
-  return name.length >= 2 && name.length <= 50;
-}
+export type IEditingStudentDTO = z.infer<typeof updateStudentSchema>

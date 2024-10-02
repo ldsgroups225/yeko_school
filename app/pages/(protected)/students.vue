@@ -6,9 +6,11 @@ import { STUDENT_COLUMNS, YEAR_OPTIONS } from '~/constants'
 // Store
 const { userData } = useUserStore()
 const studentStore = useStudentStore()
+const { fetchStudentById, fetchStudents, updateStudent } = studentStore
 const { students, isLoading, error } = storeToRefs(studentStore)
 
 // State
+const localError = ref('')
 const { data: classes, status: classFetchingStatus } = useFetch('/api/classes/classes_grouped_by_grade', { params: { schoolId: userData?.school?.id } })
 const selectedYear = ref('2024 2025')
 const selectedColumns = ref(STUDENT_COLUMNS)
@@ -18,6 +20,14 @@ const isLinkModalOpen = ref(false)
 const isUpdateModalOpen = ref(false)
 const selectedStudentForLink = ref<{ id: string, name: string } | null>(null)
 const selectedStudentForUpdate = ref<IStudentDTO | null>(null)
+
+// Confirmation dialog state
+const isConfirmDialogOpen = ref(false)
+const confirmDialogConfig = ref({
+  title: '',
+  message: '',
+  onConfirm: () => {},
+})
 
 // Composables
 const {
@@ -43,7 +53,7 @@ function getActionItems(row: IStudentDTO) {
       {
         label: 'Voir',
         icon: 'i-heroicons-eye-20-solid',
-        click: () => studentStore.fetchStudentById(row.id),
+        click: () => fetchStudentById(row.id),
       },
       {
         label: 'Modifier',
@@ -60,6 +70,10 @@ function getActionItems(row: IStudentDTO) {
           selectedStudentForLink.value = { id: row.id, name: `${row.firstName} ${row.lastName}` }
           isLinkModalOpen.value = true
         },
+      },
+      {
+        label: 'Retirer',
+        slot: 'remove-student',
       },
     ],
   ]
@@ -80,6 +94,52 @@ function getDropdownItems(subclasses: { label: string, value: string }[]) {
   }))
 }
 
+async function removeStudentFromClass(studentId: string) {
+  confirmDialogConfig.value = {
+    title: 'Confirmer le retrait de la classe',
+    message: 'Êtes-vous sûr de vouloir retirer cet élève de sa classe actuelle ?',
+    onConfirm: async () => {
+      try {
+        const success = await updateStudent(studentId, { classId: null })
+        if (!success)
+          handleError()
+      }
+      catch {
+        handleError()
+      }
+      finally {
+        isConfirmDialogOpen.value = false
+      }
+    },
+  }
+  isConfirmDialogOpen.value = true
+}
+
+async function removeStudentFromSchool(studentId: string) {
+  confirmDialogConfig.value = {
+    title: 'Confirmer le retrait de l\'école',
+    message: 'Êtes-vous sûr de vouloir retirer cet élève de l\'école ? Cette action est irréversible.',
+    onConfirm: async () => {
+      try {
+        const success = await updateStudent(studentId, { schoolId: null })
+        if (!success)
+          handleError()
+      }
+      catch {
+        handleError()
+      }
+      finally {
+        isConfirmDialogOpen.value = false
+      }
+    },
+  }
+  isConfirmDialogOpen.value = true
+}
+
+function handleError() {
+  localError.value = error.value || 'Une erreur est survenue lors du retrait de l\'élève.'
+}
+
 // Computed
 const gradeHasSelectedSubclass = computed(() => {
   return (grade: { subclasses: { id: string }[] }) => {
@@ -89,7 +149,7 @@ const gradeHasSelectedSubclass = computed(() => {
 
 // Lifecycle
 onMounted(async () => {
-  await studentStore.fetchStudents()
+  await fetchStudents()
 })
 </script>
 
@@ -212,6 +272,19 @@ onMounted(async () => {
         <template #actions-data="{ row }">
           <UDropdown :items="getActionItems(row)">
             <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
+
+            <template #remove-student>
+              <div class="group">
+                <UButton color="red" variant="ghost" label="Danger" class="w-full" />
+
+                <div mode="hover" class="w-full hidden group-hover:flex">
+                  <div class="flex p-4 flex-col rounded-md mt-1 gap-2 group-hover:bg-red-600/10">
+                    <UButton color="red" variant="ghost" label="Retirer de la classe" class="w-full" @click="removeStudentFromClass(row.id)" />
+                    <UButton color="red" variant="ghost" label="Retirer de l'école" class="w-full" @click="removeStudentFromSchool(row.id)" />
+                  </div>
+                </div>
+              </div>
+            </template>
           </UDropdown>
         </template>
       </UTable>
@@ -265,5 +338,12 @@ onMounted(async () => {
         @close="isUpdateModalOpen = false"
       />
     </UModal>
+
+    <ConfirmDialog
+      v-model="isConfirmDialogOpen"
+      :title="confirmDialogConfig.title"
+      :message="confirmDialogConfig.message"
+      :on-confirm="async () => confirmDialogConfig.onConfirm()"
+    />
   </div>
 </template>
