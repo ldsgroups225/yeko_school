@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-
 const props = defineProps<{
   studentId: string
   studentName: string
@@ -11,26 +9,28 @@ const emit = defineEmits(['close'])
 const otp = ref('')
 const isLoading = ref(false)
 const localError = ref('')
+const isConfirmationModalOpen = ref(false)
 
 const studentStore = useStudentStore()
 const { linkStudentAndParent, clearError } = studentStore
 const { error } = storeToRefs(studentStore)
 
-async function submitOTP() {
+function openConfirmationModal() {
   if (otp.value.length !== 6) {
     localError.value = 'Le code OTP doit contenir 6 chiffres.'
     return
   }
+  isConfirmationModalOpen.value = true
+}
 
+async function submitOTP() {
   isLoading.value = true
   localError.value = ''
-
   try {
     const success = await linkStudentAndParent({
       studentId: props.studentId,
       otp: otp.value,
     })
-
     if (success) {
       clearError()
       emit('close')
@@ -45,11 +45,19 @@ async function submitOTP() {
   }
   finally {
     isLoading.value = false
+    isConfirmationModalOpen.value = false
   }
 }
 
 function handleComplete(value: string) {
   otp.value = value
+}
+
+function handleConfirmationModalClose(value: boolean) {
+  isConfirmationModalOpen.value = value
+  if (!value) {
+    localError.value = ''
+  }
 }
 </script>
 
@@ -63,7 +71,6 @@ function handleComplete(value: string) {
         <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="$emit('close')" />
       </div>
     </template>
-
     <div class="p-4">
       <p class="mb-4">
         Entrez le code OTP pour lier l'élève à son parent.
@@ -75,16 +82,23 @@ function handleComplete(value: string) {
       />
       <UAlert v-if="localError" color="red" icon="i-heroicons-exclamation-triangle" :title="localError" class="mt-4" />
     </div>
-
     <template #footer>
       <div class="flex justify-end space-x-3">
         <UButton color="black" variant="soft" @click="$emit('close')">
           Annuler
         </UButton>
-        <UButton color="primary" :loading="isLoading" @click="submitOTP">
+        <UButton color="primary" :loading="isLoading" @click="openConfirmationModal">
           Lier
         </UButton>
       </div>
     </template>
   </UCard>
+
+  <ConfirmDialog
+    v-model="isConfirmationModalOpen"
+    title="Confirmer la liaison"
+    message="Êtes-vous sûr de vouloir lier cet élève à son parent avec le code OTP fourni ?"
+    :on-confirm="submitOTP"
+    @update:model-value="handleConfirmationModalClose"
+  />
 </template>

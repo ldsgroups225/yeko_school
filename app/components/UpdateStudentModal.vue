@@ -2,27 +2,19 @@
 import type { IStudentDTO, IStudentEditingDTO } from '~~/types'
 import { z } from 'zod'
 
-/**
- * Props and emits definition
- */
-const { student } = defineProps<{
+const props = defineProps<{
   student: IStudentDTO
 }>()
 
 const emit = defineEmits(['close'])
 
-/**
- * Store setup
- */
 const studentStore = useStudentStore()
 const { updateStudent } = studentStore
 const { error, isLoading } = storeToRefs(studentStore)
 
 const localError = ref('')
+const isConfirmationModalOpen = ref(false)
 
-/**
- * Initial form and gender options
- */
 let initialForm: IStudentEditingDTO
 
 const form = ref<IStudentEditingDTO>({
@@ -39,9 +31,6 @@ const genderOptions = [
   { label: 'Féminin', value: 'F' },
 ]
 
-/**
- * Schema for student update validation
- */
 const updateStudentSchema = z.object({
   firstName: z.string().min(2, 'Le prénom ne peut pas être vide').max(50, 'Le prénom doit faire moins de 50 caractères').optional(),
   lastName: z.string().min(2, 'Le nom ne peut pas être vide').max(50, 'Le nom doit faire moins de 50 caractères').optional(),
@@ -53,16 +42,10 @@ const updateStudentSchema = z.object({
   message: 'Il faut au moins un champ à mettre à jour',
 })
 
-/**
- * Computed property to check form validity
- */
 const isFormValid = computed(() => updateStudentSchema.safeParse(form.value).success)
 
-/**
- * Initialize form with student data on mount
- */
 onMounted(() => {
-  const { firstName, lastName, gender, address, avatarUrl } = student
+  const { firstName, lastName, gender, address, avatarUrl } = props.student
   initialForm = {
     firstName,
     lastName,
@@ -74,16 +57,15 @@ onMounted(() => {
   form.value = { ...initialForm }
 })
 
-/**
- * Submit form and update student if changes are detected
- * @returns {Promise<void>}
- */
-async function handleSubmit() {
+function openConfirmationModal() {
   if (!isFormValid.value) {
     localError.value = 'Veuillez remplir tous les champs obligatoires.'
     return
   }
+  isConfirmationModalOpen.value = true
+}
 
+async function handleSubmit() {
   try {
     const changedFields = getChangedFields()
 
@@ -92,18 +74,19 @@ async function handleSubmit() {
       return
     }
 
-    const success = await updateStudent(student.id, changedFields)
-    success ? emit('close') : handleError()
+    const success = await updateStudent(props.student.id, changedFields)
+    if (success) {
+      emit('close')
+    }
+    else {
+      handleError()
+    }
   }
   catch {
     handleError()
   }
 }
 
-/**
- * Get changed fields by comparing current form data with initial form data
- * @returns {Partial<IStudentEditingDTO>}
- */
 function getChangedFields(): Partial<IStudentEditingDTO> {
   return Object.entries(form.value).reduce((acc, [key, currentValue]) => {
     const typedKey = key as keyof IStudentEditingDTO
@@ -114,59 +97,73 @@ function getChangedFields(): Partial<IStudentEditingDTO> {
   }, {} as Partial<IStudentEditingDTO>)
 }
 
-/**
- * Handle errors and display appropriate message
- */
 function handleError() {
   localError.value = error.value || 'Une erreur est survenue lors de la mise à jour de l\'élève.'
+}
+
+function handleConfirmationModalClose(value: boolean) {
+  isConfirmationModalOpen.value = value
+  if (!value) {
+    localError.value = ''
+  }
 }
 </script>
 
 <template>
-  <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
-    <template #header>
-      <div class="flex items-center justify-between">
-        <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-          Modifier l'élève
-        </h3>
-        <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="$emit('close')" />
+  <div class="flex flex-col h-full">
+    <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+      <template #header>
+        <div class="flex items-center justify-between">
+          <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+            Modifier l'élève
+          </h3>
+          <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="$emit('close')" />
+        </div>
+      </template>
+      <div class="p-4 space-y-4">
+        <div class="flex justify-center">
+          <AvatarUploader
+            v-model="form.avatarBase64!"
+            size="3xl"
+          />
+        </div>
+
+        <UFormGroup label="Prénom" required>
+          <UInput v-model="form.firstName" />
+        </UFormGroup>
+
+        <UFormGroup label="Nom" required>
+          <UInput v-model="form.lastName" />
+        </UFormGroup>
+
+        <UFormGroup label="Genre" required>
+          <URadioGroup v-model="form.gender" :options="genderOptions" />
+        </UFormGroup>
+
+        <UFormGroup label="Adresse">
+          <UTextarea v-model="form.address" />
+        </UFormGroup>
+
+        <UAlert v-if="localError || error" color="red" icon="i-heroicons-exclamation-triangle" :title="localError" />
       </div>
-    </template>
-    <div class="p-4 space-y-4">
-      <div class="flex justify-center">
-        <AvatarUploader
-          v-model="form.avatarBase64!"
-          size="3xl"
-        />
-      </div>
+      <template #footer>
+        <div class="flex justify-end space-x-3">
+          <UButton color="black" variant="soft" @click="$emit('close')">
+            Annuler
+          </UButton>
+          <UButton color="primary" :loading="isLoading" :disabled="!isFormValid" @click="openConfirmationModal">
+            Mettre à jour
+          </UButton>
+        </div>
+      </template>
+    </UCard>
 
-      <UFormGroup label="Prénom" required>
-        <UInput v-model="form.firstName" />
-      </UFormGroup>
-
-      <UFormGroup label="Nom" required>
-        <UInput v-model="form.lastName" />
-      </UFormGroup>
-
-      <UFormGroup label="Genre" required>
-        <URadioGroup v-model="form.gender" :options="genderOptions" />
-      </UFormGroup>
-
-      <UFormGroup label="Adresse">
-        <UTextarea v-model="form.address" />
-      </UFormGroup>
-
-      <UAlert v-if="localError || error" color="red" icon="i-heroicons-exclamation-triangle" :title="localError" />
-    </div>
-    <template #footer>
-      <div class="flex justify-end space-x-3">
-        <UButton color="gray" variant="soft" @click="$emit('close')">
-          Annuler
-        </UButton>
-        <UButton color="primary" :loading="isLoading" :disabled="!isFormValid" @click="handleSubmit">
-          Mettre à jour
-        </UButton>
-      </div>
-    </template>
-  </UCard>
+    <ConfirmDialog
+      v-model="isConfirmationModalOpen"
+      title="Confirmer la mise à jour"
+      message="Êtes-vous sûr de vouloir mettre à jour les informations de cet élève ?"
+      :on-confirm="handleSubmit"
+      @update:model-value="handleConfirmationModalClose"
+    />
+  </div>
 </template>
