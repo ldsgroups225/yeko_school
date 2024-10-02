@@ -6,28 +6,17 @@ import { STUDENT_COLUMNS, YEAR_OPTIONS } from '~/constants'
 // Store
 const { userData } = useUserStore()
 const studentStore = useStudentStore()
-const { fetchStudentById, fetchStudents, updateStudent } = studentStore
+const { fetchStudents, updateStudent } = studentStore
 const { students, isLoading, error } = storeToRefs(studentStore)
 
 // State
-const localError = ref('')
 const { data: classes, status: classFetchingStatus } = useFetch('/api/classes/classes_grouped_by_grade', { params: { schoolId: userData?.school?.id } })
 const selectedYear = ref('2024 2025')
 const selectedColumns = ref(STUDENT_COLUMNS)
 
 // Modal state
-const isLinkModalOpen = ref(false)
-const isUpdateModalOpen = ref(false)
-const selectedStudentForLink = ref<{ id: string, name: string } | null>(null)
-const selectedStudentForUpdate = ref<IStudentDTO | null>(null)
-
-// Confirmation dialog state
-const isConfirmDialogOpen = ref(false)
-const confirmDialogConfig = ref({
-  title: '',
-  message: '',
-  onConfirm: () => {},
-})
+const { isOpen: isLinkModalOpen, selectedStudent: selectedStudentForLink } = useCsModal<{ id: string, name: string }>()
+const { isOpen: isUpdateModalOpen, selectedStudent: selectedStudentForUpdate } = useCsModal<IStudentDTO>()
 
 // Composables
 const {
@@ -46,98 +35,33 @@ const {
   resetFilters,
 } = useTableState<IStudentDTO>(students)
 
+const {
+  isConfirmDialogOpen,
+  confirmDialogConfig,
+  openConfirmDialog,
+} = useConfirmDialog()
+
 // Methods
-function getActionItems(row: IStudentDTO) {
-  return [
-    [
-      {
-        label: 'Voir',
-        icon: 'i-heroicons-eye-20-solid',
-        click: () => fetchStudentById(row.id),
-      },
-      {
-        label: 'Modifier',
-        icon: 'i-heroicons-pencil-square-20-solid',
-        click: () => {
-          selectedStudentForUpdate.value = row
-          isUpdateModalOpen.value = true
-        },
-      },
-      {
-        label: 'Lier à son parent',
-        icon: 'i-heroicons-link-20-solid',
-        click: () => {
-          selectedStudentForLink.value = { id: row.id, name: `${row.firstName} ${row.lastName}` }
-          isLinkModalOpen.value = true
-        },
-      },
-      {
-        label: 'Retirer',
-        slot: 'remove-student',
-      },
-    ],
-  ]
+function toggleSubclassSelection(subclassValue: string) {
+  selectedClasses.value = selectedClasses.value.includes(subclassValue)
+    ? selectedClasses.value.filter(c => c !== subclassValue)
+    : [...selectedClasses.value, subclassValue]
 }
 
-function getDropdownItems(subclasses: { label: string, value: string }[]) {
-  return subclasses.map(subclass => ({
-    label: selectedClasses.value.includes(subclass.value) ? `${subclass.label} ✔️` : `${subclass.label}`,
-    click: () => {
-      if (selectedClasses.value.includes(subclass.value)) {
-        selectedClasses.value = selectedClasses.value.filter(c => c !== subclass.value)
-      }
-      else {
-        selectedClasses.value.push(subclass.value)
-      }
-    },
-    selected: selectedClasses.value.includes(subclass.value),
-  }))
-}
-
-async function removeStudentFromClass(studentId: string) {
-  confirmDialogConfig.value = {
+function handleRemoveStudentFromClass(studentId: string) {
+  return openConfirmDialog({
     title: 'Confirmer le retrait de la classe',
     message: 'Êtes-vous sûr de vouloir retirer cet élève de sa classe actuelle ?',
-    onConfirm: async () => {
-      try {
-        const success = await updateStudent(studentId, { classId: null })
-        if (!success)
-          handleError()
-      }
-      catch {
-        handleError()
-      }
-      finally {
-        isConfirmDialogOpen.value = false
-      }
-    },
-  }
-  isConfirmDialogOpen.value = true
+    onConfirm: () => updateStudent(studentId, { classId: null }),
+  })
 }
 
-async function removeStudentFromSchool(studentId: string) {
-  confirmDialogConfig.value = {
+function handleRemoveStudentFromSchool(studentId: string) {
+  return openConfirmDialog({
     title: 'Confirmer le retrait de l\'école',
     message: 'Êtes-vous sûr de vouloir retirer cet élève de l\'école ? Cette action est irréversible.',
-    onConfirm: async () => {
-      try {
-        const success = await updateStudent(studentId, { schoolId: null })
-        if (!success)
-          handleError()
-      }
-      catch {
-        handleError()
-      }
-      finally {
-        isConfirmDialogOpen.value = false
-      }
-    },
-  }
-  isConfirmDialogOpen.value = true
-}
-
-function handleError() {
-  localError.value = error.value || 'Une erreur est survenue lors du retrait de l\'élève.'
+    onConfirm: () => updateStudent(studentId, { schoolId: null }),
+  })
 }
 
 // Computed
@@ -167,158 +91,56 @@ onMounted(async () => {
         footer: { padding: 'p-4' },
       }"
     >
-      <!-- Header -->
       <template #header>
-        <div class="flex items-center justify-between">
-          <h2 class="text-xl font-semibold">
-            Liste des étudiants
-          </h2>
-          <div class="flex items-center space-x-2">
-            <UButton variant="outline" icon="i-heroicons-users" />
-            <USelectMenu v-model="selectedYear" :options="YEAR_OPTIONS" />
-          </div>
-        </div>
+        <StudentListHeader :selected-year="selectedYear" :year-options="YEAR_OPTIONS" />
       </template>
 
-      <!-- Search and Filters -->
-      <div class="flex items-center justify-between gap-3 px-4 py-3">
-        <UInput v-model="searchTerm" icon="i-heroicons-magnifying-glass-20-solid" placeholder="Rechercher un étudiant..." />
-        <div class="flex flex-wrap gap-2">
-          <UDropdown
-            v-for="cls in classes?.data"
-            :key="cls.name"
-            :items="[getDropdownItems(cls.subclasses.map(s => ({ label: s.name, value: s.id })))]"
-          >
-            <UButton variant="outline" class="flex items-center">
-              {{ cls.name }}
-              <UIcon name="i-heroicons-chevron-down" class="ml-2 h-4 w-4" />
-              <UIcon
-                v-if="gradeHasSelectedSubclass(cls)"
-                name="i-heroicons-eye-20-solid"
-                class="ml-1 h-4 w-4 text-green-700 dark:text-green-400"
-              />
-            </UButton>
-          </UDropdown>
-        </div>
-      </div>
+      <StudentListFilters
+        v-model:search-term="searchTerm"
+        :classes="classes?.data"
+        :selected-classes="selectedClasses"
+        :grade-has-selected-subclass="gradeHasSelectedSubclass"
+        @toggle-subclass="toggleSubclassSelection"
+      />
 
-      <!-- Table Controls -->
-      <div class="flex justify-between items-center w-full px-4 py-3">
-        <div class="flex items-center gap-1.5">
-          <span class="text-sm leading-5">Lignes par page:</span>
-          <USelect
-            v-model="itemsPerPage"
-            :options="[5, 10, 20, 30, 50]"
-            class="me-2 w-20"
-            size="xs"
-          />
-        </div>
-        <div class="flex gap-1.5 items-center">
-          <UDropdown v-if="selectedRows.length > 1" :items="[]">
-            <UButton
-              icon="i-heroicons-chevron-down"
-              trailing
-              color="gray"
-              size="xs"
-            >
-              Actions groupées
-            </UButton>
-          </UDropdown>
-          <USelectMenu v-model="selectedColumns" :options="STUDENT_COLUMNS" multiple>
-            <UButton
-              icon="i-heroicons-view-columns"
-              color="gray"
-              size="xs"
-            >
-              Colonnes
-            </UButton>
-          </USelectMenu>
-          <UButton
-            icon="i-heroicons-funnel"
-            color="gray"
-            size="xs"
-            :disabled="searchTerm === '' && selectedClasses.length === 0"
-            @click="resetFilters"
-          >
-            Réinitialiser
-          </UButton>
-        </div>
-      </div>
+      <StudentListControls
+        v-model:items-per-page="itemsPerPage"
+        v-model:selected-columns="selectedColumns"
+        :selected-rows-count="selectedRows.length"
+        :search-term="searchTerm"
+        :selected-classes="selectedClasses"
+        @reset-filters="resetFilters"
+      />
 
-      <!-- Table -->
-      <UTable
-        v-model="selectedRows"
+      <StudentTable
+        v-model:selected-rows="selectedRows"
         v-model:sort="sort"
         :rows="paginatedData"
         :columns="selectedColumns"
         :loading="isLoading || classFetchingStatus === 'pending'"
-        sort-asc-icon="i-heroicons-arrow-up"
-        sort-desc-icon="i-heroicons-arrow-down"
-        :ui="{
-          td: { base: 'max-w-[0] truncate' },
-          default: { checkbox: { color: 'primary' as any } },
-        }"
+        :page-from="pageFrom"
         @select="selectRow"
+        @remove-from-class="handleRemoveStudentFromClass"
+        @remove-from-school="handleRemoveStudentFromSchool"
       >
-        <template #index-data="{ index }">
-          {{ pageFrom + index }}
-        </template>
-        <template #dateOfBirth-data="{ row }">
+        <template #date-of-birth-data="{ row }">
           {{ formatDate(row.dateOfBirth) }}
         </template>
         <template #age-data="{ row }">
           {{ getAge(row.dateOfBirth) }}
         </template>
-        <template #actions-data="{ row }">
-          <UDropdown :items="getActionItems(row)">
-            <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
+      </StudentTable>
 
-            <template #remove-student>
-              <div class="group">
-                <UButton color="red" variant="ghost" label="Danger" class="w-full" />
-
-                <div mode="hover" class="w-full hidden group-hover:flex">
-                  <div class="flex p-4 flex-col rounded-md mt-1 gap-2 group-hover:bg-red-600/10">
-                    <UButton color="red" variant="ghost" label="Retirer de la classe" class="w-full" @click="removeStudentFromClass(row.id)" />
-                    <UButton color="red" variant="ghost" label="Retirer de l'école" class="w-full" @click="removeStudentFromSchool(row.id)" />
-                  </div>
-                </div>
-              </div>
-            </template>
-          </UDropdown>
-        </template>
-      </UTable>
-
-      <!-- Footer -->
       <template #footer>
-        <div class="flex flex-wrap justify-between items-center">
-          <div>
-            <span class="text-sm leading-5">
-              Affichage de
-              <span class="font-medium">{{ pageFrom }}</span>
-              à
-              <span class="font-medium">{{ pageTo }}</span>
-              sur
-              <span class="font-medium">{{ paginatedData.length }}</span>
-              résultats
-            </span>
-          </div>
-          <UPagination
-            v-model="currentPage"
-            :page-count="itemsPerPage"
-            :total="pageCount"
-            :ui="{
-              wrapper: 'flex items-center gap-1',
-              rounded: '!rounded-full min-w-[32px] justify-center',
-              default: {
-                activeButton: {
-                  variant: 'outline',
-                },
-              },
-            }"
-            @change="onPageChange"
-          />
-        </div>
+        <StudentListPagination
+          v-model:current-page="currentPage"
+          :page-from="pageFrom"
+          :page-to="pageTo"
+          :total="paginatedData.length"
+          :page-count="itemsPerPage"
+          :total-pages="pageCount"
+          @change="onPageChange"
+        />
       </template>
     </UCard>
 
