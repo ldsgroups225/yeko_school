@@ -33,6 +33,8 @@ const {
   searchTerm,
   selectedClasses,
   resetFilters,
+  hasNotParentFilter,
+  hasNotClassFilter,
 } = useTableState<IStudentDTO>(students)
 
 const {
@@ -109,7 +111,11 @@ onMounted(async () => {
         :selected-rows-count="selectedRows.length"
         :search-term="searchTerm"
         :selected-classes="selectedClasses"
+        :has-not-parent-filter-active="hasNotParentFilter"
+        :has-not-class-filter-active="hasNotClassFilter"
         @reset-filters="resetFilters"
+        @has-not-parent-filter="() => hasNotParentFilter = !hasNotParentFilter"
+        @has-not-class-filter="() => hasNotClassFilter = !hasNotClassFilter"
       />
 
       <StudentTable

@@ -6,12 +6,16 @@ defineProps<{
   selectedRowsCount: number
   searchTerm: string
   selectedClasses: string[]
+  hasNotParentFilterActive: boolean
+  hasNotClassFilterActive: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'update:itemsPerPage', value: number): void
   (e: 'update:selectedColumns', value: typeof STUDENT_COLUMNS): void
   (e: 'resetFilters'): void
+  (e: 'hasNotParentFilter'): void
+  (e: 'hasNotClassFilter'): void
 }>()
 
 const selectedColumns = defineModel<typeof STUDENT_COLUMNS>('selectedColumns', { default: STUDENT_COLUMNS })
@@ -30,6 +34,9 @@ const selectedColumns = defineModel<typeof STUDENT_COLUMNS>('selectedColumns', {
       />
     </div>
     <div class="flex gap-1.5 items-center">
+      <UButton leading-icon="i-carbon-user-favorite" trailing :color="!hasNotParentFilterActive ? 'black' : 'blue'" variant="outline" size="xs" label="Pas de parent" @click="emit('hasNotParentFilter')" />
+      <UButton leading-icon="i-heroicons-link-slash" trailing :color="!hasNotClassFilterActive ? 'black' : 'blue'" variant="outline" size="xs" label="Pas de classe" @click="emit('hasNotClassFilter')" />
+
       <UDropdown v-if="selectedRowsCount > 1" :items="[]">
         <UButton
           icon="i-heroicons-chevron-down"

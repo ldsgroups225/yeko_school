@@ -6,7 +6,7 @@ export function useTableState<T extends { [key: string]: any }>(data: Ref<T[]>) 
   const sort = ref<{ column: string, direction: 'asc' | 'desc' }>({ column: 'lastName', direction: 'asc' })
   const selectedRows = ref<T[]>([])
 
-  const { searchTerm, selectedClasses, filteredData, resetFilters } = useFilters(data)
+  const { searchTerm, selectedClasses, filteredData, resetFilters, hasNotParentFilter, hasNotClassFilter } = useFilters(data)
 
   const sortedData = computed(() => {
     return [...filteredData.value].sort((a, b) => {
@@ -70,5 +70,7 @@ export function useTableState<T extends { [key: string]: any }>(data: Ref<T[]>) 
     searchTerm,
     selectedClasses,
     resetFilters,
+    hasNotParentFilter,
+    hasNotClassFilter,
   }
 }
