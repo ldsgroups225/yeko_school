@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { IStudentDTO } from '~~/types'
 import { getAge } from '~~/utils/dateTime.js'
+import { formatFullName } from '~~/utils/formatting'
 import type { STUDENT_COLUMNS } from '~/constants'
 
 defineProps<{
@@ -14,6 +15,8 @@ const emit = defineEmits<{
   (e: 'update:selectedRows', value: IStudentDTO[]): void
   (e: 'update:sort', value: { column: string, direction: 'asc' | 'desc' } | null): void
   (e: 'select', value: IStudentDTO): void
+  (e: 'showLinkModal', value: { id: string, name: string }): void
+  (e: 'showUpdateModal', value: IStudentDTO): void
   (e: 'removeFromClass', value: string): void
   (e: 'removeFromSchool', value: string): void
 }>()
@@ -31,12 +34,21 @@ function getActionItems(row: IStudentDTO) {
       {
         label: 'Modifier',
         icon: 'i-heroicons-pencil-square-20-solid',
-        click: () => emit('select', row),
+        click: () => {
+          emit('select', row)
+          emit('showUpdateModal', row)
+        },
       },
       {
         label: 'Lier à son parent',
         icon: 'i-heroicons-link-20-solid',
-        click: () => emit('select', row),
+        click: () => {
+          emit('select', row)
+          emit('showLinkModal', {
+            id: row.id,
+            name: formatFullName(row.firstName, row.lastName),
+          })
+        },
       },
       {
         label: 'Retirer',

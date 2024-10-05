@@ -83,7 +83,7 @@ async function onSubmit(data: any) {
 <template>
   <div class="flex flex-col items-center justify-center min-h-screen px-4 py-12 sm:px-6 lg:px-8">
     <UCard class="max-w-sm w-full">
-      <UAuthForm
+      <AuthForm
         :fields="fields"
         :title="t('welcomeBack')"
         :ui="{ base: 'text-center', footer: 'text-center' }"
@@ -117,7 +117,7 @@ async function onSubmit(data: any) {
           </NuxtLink>
           .
         </template>
-      </UAuthForm>
+      </AuthForm>
     </UCard>
   </div>
 </template>

@@ -13,10 +13,10 @@ const { students, isLoading, error } = storeToRefs(studentStore)
 const { data: classes, status: classFetchingStatus } = useFetch('/api/classes/classes_grouped_by_grade', { params: { schoolId: userData?.school?.id } })
 const selectedYear = ref('2024 2025')
 const selectedColumns = ref(STUDENT_COLUMNS)
-
-// Modal state
-const { isOpen: isLinkModalOpen, selectedStudent: selectedStudentForLink } = useCsModal<{ id: string, name: string }>()
-const { isOpen: isUpdateModalOpen, selectedStudent: selectedStudentForUpdate } = useCsModal<IStudentDTO>()
+const isLinkModalOpen = ref(false)
+const selectedStudentForLink = ref<{ id: string, name: string } | null>(null)
+const isUpdateModalOpen = ref(false)
+const selectedStudentForUpdate = ref<IStudentDTO | null>(null)
 
 // Composables
 const {
@@ -126,6 +126,8 @@ onMounted(async () => {
         :loading="isLoading || classFetchingStatus === 'pending'"
         :page-from="pageFrom"
         @select="selectRow"
+        @show-link-modal="(student) => { selectedStudentForLink = student; isLinkModalOpen = true }"
+        @show-update-modal="(student) => { selectedStudentForUpdate = student; isUpdateModalOpen = true }"
         @remove-from-class="handleRemoveStudentFromClass"
         @remove-from-school="handleRemoveStudentFromSchool"
       >
@@ -155,7 +157,7 @@ onMounted(async () => {
         v-if="selectedStudentForLink"
         :student-id="selectedStudentForLink.id"
         :student-name="selectedStudentForLink.name"
-        @close="isLinkModalOpen = false"
+        @close="isLinkModalOpen = false; selectedStudentForLink = null"
       />
     </UModal>
 
@@ -163,7 +165,7 @@ onMounted(async () => {
       <UpdateStudentModal
         v-if="selectedStudentForUpdate"
         :student="selectedStudentForUpdate"
-        @close="isUpdateModalOpen = false"
+        @close="isUpdateModalOpen = false; selectedStudentForUpdate = null"
       />
     </UModal>
 
