@@ -1,5 +1,3 @@
-import { se } from 'date-fns/locale'
-
 export function useFilters<T extends { [key: string]: any }>(data: Ref<T[]>) {
   const searchTerm = ref('')
   const selectedClasses = ref<string[]>([])

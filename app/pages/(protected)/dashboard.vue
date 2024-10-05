@@ -35,7 +35,8 @@ function onUpdateSort(newSort: { column: string, direction: 'asc' | 'desc' }) {
 }
 
 function logAction(action: string, row: { id: number }) {
-  console.log(action, row.id)
+  const _toDeleteLater = action + row
+  throw new Error(`Function is not implemented`)
 }
 
 function getActionItems(row: { id: number }) {
