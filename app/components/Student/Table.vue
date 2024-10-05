@@ -26,7 +26,7 @@ function getActionItems(row: IStudentDTO) {
       {
         label: 'Voir',
         icon: 'i-heroicons-eye-20-solid',
-        click: () => navigateTo(`/students/${row.id}`),
+        click: () => navigateTo(`/students/${row.idNumber}`),
       },
       {
         label: 'Modifier',

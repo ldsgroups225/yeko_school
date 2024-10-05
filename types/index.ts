@@ -72,16 +72,57 @@ export interface ISchoolDTO {
   updatedBy: string
 }
 
-export interface IUserProfileDTO {
-  id: string
+export interface IParentDTO {
+  id?: string
   firstName: string
   lastName: string
   email: string
+  phoneNumber: string
+  avatarUrl: string | null
+  createdAt?: string
+  createdBy?: string
+  updatedAt?: string
+  updatedBy?: string
+}
+
+export interface IUserProfileDTO extends IParentDTO {
   role: string
   fullName?: string
-  phoneNumber?: string
-  avatar?: string | null
   school: ISchoolDTO
+}
+
+export interface IAttendanceDTO {
+  id: string
+  studentId: string
+  classId: string
+  date: string
+  from: string
+  to: string
+  status: 'Present' | 'Absent' | 'Late'
+}
+
+export interface IParticipationDTO {
+  id: string
+  studentId: string
+  classId: string
+  subjectId: string
+  subjectName: string
+  note: number
+  date: string
+}
+
+export interface IControlNoteDTO {
+  id?: string
+  teacherId: string
+  classId: string
+  subjectId: string
+  subjectName: string
+  note: number
+  date: string
+  createdAt?: string
+  createdBy?: string
+  updatedAt?: string
+  updatedBy?: string
 }
 
 export interface IStudentDTO {
@@ -101,6 +142,12 @@ export interface IStudentDTO {
   createdBy: string | null
   updatedAt: string | null
   updatedBy: string | null
+  parent?: IParentDTO
+  controlNotes?: IControlNoteDTO[]
+  controlNoteAverage?: number
+  participations?: IParticipationDTO[]
+  attendances?: IAttendanceDTO[]
+  generatedDescriptionBasedOnPerformance?: string
 }
 
 export interface IStudentEditingDTO {

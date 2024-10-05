@@ -43,7 +43,21 @@
   "iconify.annotations": true,
   "iconify.inplace": true,
   "cSpell.language": "en, fr",
+  "cSpell.ignorePaths": [
+    "package.json",
+    "package-lock.json",
+    "node_modules",
+    "vscode-extension",
+    ".git/objects",
+    ".vscode",
+    ".vscode-insiders",
+    "**/settings.json"
+  ],
   "cSpell.words": [
-    "ilike"
+    "ilike",
+    "intérrogations",
+    "pinia",
+    "Nuxt",
+    "Yeko"
   ]
 }
