@@ -70,14 +70,14 @@ export const useUserStore = defineStore('user', {
       this.isLoading = true
       this.error = null
       try {
-        const { data, error } = await useFetch<{ success: boolean }>('/api/auth/login', {
+        const { success, message } = await $fetch<{ success: boolean, message: any }>('/api/auth/login', {
           method: 'POST',
           body: credentials,
         })
-        if (error.value) {
-          throw createError(error.value)
+        if (!success) {
+          throw message
         }
-        if (data.value && data.value.success) {
+        if (success) {
           // If login is successful, fetch user data
           await this.fetchUserData()
         }
@@ -86,8 +86,8 @@ export const useUserStore = defineStore('user', {
         }
       }
       catch (error) {
-        this.error = error instanceof Error ? error.message : 'An unknown error occurred'
-        console.error('Error during login:', error)
+        const _error: { message: string } = error as { message: string }
+        this.error = _error.message
       }
       finally {
         this.isLoading = false
@@ -100,11 +100,15 @@ export const useUserStore = defineStore('user', {
      * @description Fetches the user's data from the server and updates the store.
      * @throws {Error} If fetching user data fails or an error occurs during the process.
      */
-    async fetchUserData() {
+    async fetchUserData(withRedirect?: string) {
       this.isLoading = true
       this.error = null
       try {
-        const { data, success } = await $fetch('/api/auth/me')
+        const { data, success } = await $fetch('/api/auth/me', {
+          params: {
+            'with-redirect': withRedirect,
+          },
+        })
 
         if (success) {
           this.userData = data

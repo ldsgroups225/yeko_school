@@ -193,16 +193,24 @@ async function validateAndParseFormData(formData: unknown): Promise<LoginFormDat
  * });
  */
 export default defineEventHandler(async (event) => {
-  const formData = await readBody(event)
-  const { email, password } = await validateAndParseFormData(formData)
+  try {
+    const formData = await readBody(event)
+    const { email, password } = await validateAndParseFormData(formData)
 
-  const client = await serverSupabaseClient(event)
-  const { data, error } = await client.auth.signInWithPassword({ email, password })
+    const client = await serverSupabaseClient(event)
+    const { error } = await client.auth.signInWithPassword({ email, password })
 
-  if (error) {
-    console.error('[E_SIGN_IN]', error)
-    throwI18nErrorBasedOnCode(error.code ?? 'unexpected_failure')
+    if (error) {
+      console.error('[E_SIGN_IN]', error.code)
+      throwI18nErrorBasedOnCode(error.code ?? 'unexpected_failure')
+    }
+
+    return { success: true, message: null }
   }
-
-  return { success: true, data: data.user?.id }
+  catch (error) {
+    return {
+      success: false,
+      message: error,
+    }
+  }
 })

@@ -214,8 +214,12 @@ export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient(event)
 
   try {
+    const { 'with-redirect': withRedirect } = getQuery(event)
     const profile = await fetchUserProfile(client, user.id)
     const school = await fetchSchool(client, profile.schoolId)
+
+    if (withRedirect && (withRedirect as string).length > 0)
+      sendRedirect(event, `${withRedirect}`)
 
     return formatUserResponse(user, profile, school)
   }

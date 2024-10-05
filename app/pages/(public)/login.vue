@@ -3,7 +3,7 @@ import { useUserStore } from '~/stores/userStore'
 
 definePageMeta({
   layout: 'auth',
-  // middleware: ['guest'],
+  middleware: ['un-auth'],
 })
 
 const { t } = useI18n()
@@ -72,6 +72,11 @@ async function onSubmit(data: any) {
     if (isAuthenticated?.value) {
       // Redirect to dashboard or home page
       navigateTo('/dashboard')
+
+      // clears the form
+      data.email = ''
+      data.password = ''
+      data.remember = false
     }
   }
   catch (error) {
