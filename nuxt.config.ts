@@ -2,7 +2,6 @@ import { pwa } from './app/config/pwa'
 import { appDescription } from './app/constants/index'
 
 export default defineNuxtConfig({
-  extends: ['@nuxt/ui-pro'],
   modules: [
     '@nuxt/ui',
     '@vueuse/nuxt',
