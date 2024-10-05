@@ -3,7 +3,7 @@ import { useUserStore } from '~/stores/userStore'
 
 definePageMeta({
   layout: 'auth',
-  middleware: ['un-auth'],
+  // middleware: ['un-auth'],
 })
 
 const { t } = useI18n()

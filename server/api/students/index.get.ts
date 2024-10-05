@@ -1,6 +1,5 @@
-import type { Database } from '~~/types/database.types'
-import type { IStudentDTO } from '../../../types'
-import { serverSupabaseClient } from '#supabase/server'
+import type { IStudentDTO } from '~~/types'
+import { type ClientType, csServerSupabaseClient } from '~~/server/utils'
 import { z } from 'zod'
 
 /**
@@ -68,7 +67,7 @@ async function validateAndParseQueryParams(query: unknown): Promise<ValidatedQue
  * const supabaseQuery = buildSupabaseQuery(supabase, query);
  * const { data, error } = await supabaseQuery;
  */
-function buildSupabaseQuery(client: any, query: ValidatedQueryParams) {
+function buildSupabaseQuery(client: ClientType, query: ValidatedQueryParams) {
   let supabaseQuery = client
     .from('students')
     .select(`
@@ -127,7 +126,7 @@ function buildSupabaseQuery(client: any, query: ValidatedQueryParams) {
  * });
  */
 export default defineEventHandler(async (event) => {
-  const client = await serverSupabaseClient<Database>(event)
+  const client = await csServerSupabaseClient(event)
   const rawQuery = getQuery(event)
 
   // Validate and parse query parameters
@@ -142,18 +141,18 @@ export default defineEventHandler(async (event) => {
     throwI18nError('Erreur lors de la récupération des étudiants', 500)
   }
 
-  const parsedStudents = students.map((student: { id: any, parent_id: any, school_id: any, class_id: any, class: { name: any }, id_number: any, first_name: any, last_name: any, date_of_birth: any, gender: any, address: any, avatar_url: any, created_at: any, created_by: any, updated_at: any, updated_by: any }) => {
+  const parsedStudents = students.map((student) => {
     return {
       id: student.id,
       parentId: student.parent_id,
       schoolId: student.school_id,
       classId: student.class_id,
-      className: student.class?.name,
+      className: student.class?.name || null,
       idNumber: student.id_number,
       firstName: student.first_name,
       lastName: student.last_name,
       dateOfBirth: student.date_of_birth,
-      gender: student.gender,
+      gender: (student.gender || 'M') as 'M' | 'F',
       address: student.address,
       avatarUrl: student.avatar_url,
       createdAt: student.created_at,

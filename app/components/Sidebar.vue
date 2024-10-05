@@ -4,6 +4,7 @@ const sidebarExpanded = ref(false)
 const toggleSidebar = () => sidebarExpanded.value = !sidebarExpanded.value
 
 const userStore = useUserStore()
+const { logout } = userStore
 const { userData: user, isLoading } = storeToRefs(userStore)
 
 const sidebarItems = [
@@ -23,7 +24,8 @@ const profileDropdownItems = computed(() => [
 ])
 
 async function handleLogout() {
-  await userStore.logout()
+  await logout()
+  navigateTo('/login')
 }
 </script>
 

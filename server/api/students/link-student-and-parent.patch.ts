@@ -4,7 +4,7 @@
  * @module LinkStudentParentHandler
  */
 
-import { serverSupabaseClient } from '#supabase/server'
+import { ClientType, csServerSupabaseClient } from '~~/server/utils'
 import { z } from 'zod'
 
 /**
@@ -75,7 +75,7 @@ async function validateAndParseData(data: unknown): Promise<LinkStudentParentDat
  *   console.error(error.statusCode, error.message);
  * }
  */
-async function checkOTP(client: any, otp: string): Promise<string> {
+async function checkOTP(client: ClientType, otp: string): Promise<string> {
   const { data, error } = await client
     .from('link_student_parent')
     .select('parent_id, is_used, expired_at')
@@ -124,7 +124,7 @@ async function checkOTP(client: any, otp: string): Promise<string> {
  *   console.error(error.statusCode, error.message);
  * }
  */
-async function updateStudentParent(client: any, studentId: string, parentId: string): Promise<void> {
+async function updateStudentParent(client: ClientType, studentId: string, parentId: string): Promise<void> {
   const { error } = await client
     .from('students')
     .update({ parent_id: parentId })
@@ -155,7 +155,7 @@ async function updateStudentParent(client: any, studentId: string, parentId: str
  *   console.error(error.statusCode, error.message);
  * }
  */
-async function markOTPAsUsed(client: any, otp: string): Promise<void> {
+async function markOTPAsUsed(client: ClientType, otp: string): Promise<void> {
   const { error } = await client
     .from('link_student_parent')
     .update({ is_used: true })
@@ -203,7 +203,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { studentId, otp } = await validateAndParseData(body)
 
-  const client = await serverSupabaseClient(event)
+  const client = await csServerSupabaseClient(event)
 
   try {
     const parentId = await checkOTP(client, otp)

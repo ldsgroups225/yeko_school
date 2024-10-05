@@ -5,7 +5,8 @@
  */
 
 import type { ISchoolDTO, IUserProfileDTO } from '../../../types'
-import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
+import { serverSupabaseUser } from '#supabase/server'
+import { ClientType, csServerSupabaseClient } from '~~/server/utils'
 import { ERole, roleToString } from '../../../types'
 
 /**
@@ -211,7 +212,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const client = await serverSupabaseClient(event)
+  const client = await csServerSupabaseClient(event)
 
   try {
     const { 'with-redirect': withRedirect } = getQuery(event)

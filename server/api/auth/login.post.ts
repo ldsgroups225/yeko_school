@@ -1,4 +1,4 @@
-import { serverSupabaseClient } from '#supabase/server'
+import { csServerSupabaseClient } from '~~/server/utils'
 import { z } from 'zod'
 
 /**
@@ -197,7 +197,7 @@ export default defineEventHandler(async (event) => {
     const formData = await readBody(event)
     const { email, password } = await validateAndParseFormData(formData)
 
-    const client = await serverSupabaseClient(event)
+    const client = await csServerSupabaseClient(event)
     const { error } = await client.auth.signInWithPassword({ email, password })
 
     if (error) {

@@ -130,7 +130,7 @@ export interface IStudentDTO {
   parentId: string
   schoolId: string | null
   classId: string | null
-  className: string | null
+  className?: string | null
   idNumber: string
   firstName: string
   lastName: string

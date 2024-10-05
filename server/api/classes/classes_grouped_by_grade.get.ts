@@ -1,5 +1,5 @@
 import type { Class } from '../../../types'
-import { serverSupabaseClient } from '#supabase/server'
+import { csServerSupabaseClient, type ClientType } from '~~/server/utils'
 import { z } from 'zod'
 
 // Schema for query validation
@@ -14,7 +14,7 @@ async function validateQuery(query: unknown) {
 }
 
 // Builds and executes the Supabase RPC query
-async function fetchClasses(client: any, schoolId: string) {
+async function fetchClasses(client: ClientType, schoolId: string) {
   const { data, error } = await client.rpc('get_classes_by_school', { school_id: schoolId })
   if (error)
     throw createError({ statusCode: 500, message: 'Erreur lors de la récupération des étudiants' })
@@ -23,7 +23,7 @@ async function fetchClasses(client: any, schoolId: string) {
 
 // Main event handler
 export default defineEventHandler(async (event) => {
-  const client = await serverSupabaseClient(event)
+  const client = await csServerSupabaseClient(event)
   const query = await validateQuery(getQuery(event))
 
   const students = await fetchClasses(client, query.schoolId)
