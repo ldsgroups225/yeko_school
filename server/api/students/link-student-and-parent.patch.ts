@@ -4,7 +4,8 @@
  * @module LinkStudentParentHandler
  */
 
-import { ClientType, csServerSupabaseClient } from '~~/server/utils'
+import type { ClientType } from '~~/server/utils'
+import { csServerSupabaseClient } from '~~/server/utils'
 import { z } from 'zod'
 
 /**

@@ -56,11 +56,16 @@ export const useStudentStore = defineStore('student', {
     /**
      * @function getStudentById
      * @description Retrieves a student by their ID.
-     * @param {string} id - The ID of the student to retrieve.
      * @returns {(id: string) => IStudentDTO | undefined} Function to get a student by ID.
      */
-    getStudentById: state => (id: string) => {
-      return state.students.find(student => student.id === id)
+    getStudentById: (state) => {
+    /**
+     * @param {string} id - The ID of the student to retrieve.
+     * @returns {IStudentDTO | undefined} The student with the given ID, or undefined if not found.
+     */
+      return (id: string) => {
+        return state.students.find(student => student.id === id)
+      }
     },
   },
 

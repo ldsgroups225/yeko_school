@@ -6,7 +6,7 @@
 
 import type { ISchoolDTO, IUserProfileDTO } from '../../../types'
 import { serverSupabaseUser } from '#supabase/server'
-import { ClientType, csServerSupabaseClient } from '~~/server/utils'
+import { csServerSupabaseClient } from '~~/server/utils'
 import { ERole, roleToString } from '../../../types'
 
 /**

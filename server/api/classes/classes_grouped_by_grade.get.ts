@@ -1,5 +1,5 @@
 import type { Class } from '../../../types'
-import { csServerSupabaseClient, type ClientType } from '~~/server/utils'
+import { type ClientType, csServerSupabaseClient } from '~~/server/utils'
 import { z } from 'zod'
 
 // Schema for query validation
