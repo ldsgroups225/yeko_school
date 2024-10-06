@@ -26,14 +26,14 @@ const form = ref<IUpdateClassDTO>({
   name: '',
   mainTeacherId: '',
   gradeId: 0,
-  schoolId: userData.value.school.id,
+  schoolId: userData.value!.school.id,
 })
 
 const supabase = useSupabaseClient<Database>()
 const { data: grades, error: gradesError } = await useAsyncData('grades', async () => {
   const { data, error } = await supabase.from('grades')
     .select('value:id, label:name')
-    .eq('cycle_id', userData.value.school.cycleId)
+    .eq('cycle_id', userData.value!.school.cycleId)
     .order('id')
   if (error) {
     throw error
@@ -66,7 +66,7 @@ onMounted(() => {
       name,
       gradeId,
       mainTeacherId: mainTeacherId ?? '',
-      schoolId: userData.value.school.id,
+      schoolId: userData.value!.school.id,
     }
     form.value = { ...initialForm }
   }
@@ -131,7 +131,7 @@ function handleConfirmationModalClose(value: boolean) {
           <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="$emit('close')" />
         </div>
 
-        <UAlert v-if="gradesError || teachersError" color="red" icon="i-heroicons-exclamation-triangle" :title="gradesError || teachersError" />
+        <UAlert v-if="localError || gradesError || teachersError" color="red" icon="i-heroicons-exclamation-triangle" :title="localError || gradesError?.message || teachersError?.message" />
       </template>
       <div class="p-4 space-y-4">
         <UFormGroup label="Nom de la classe" required>
@@ -143,7 +143,7 @@ function handleConfirmationModalClose(value: boolean) {
         </UFormGroup>
 
         <UFormGroup label="Enseignant principal">
-          <USelectMenu v-model="form.mainTeacherId" :options="teachers" placeholder="Choix..." value-attribute="value" option-attribute="label" />
+          <USelectMenu v-model="form.mainTeacherId as any" :options="teachers" placeholder="Choix..." value-attribute="value" option-attribute="label" />
         </UFormGroup>
 
         <UAlert v-if="localError || error" color="red" icon="i-heroicons-exclamation-triangle" :title="localError" />
