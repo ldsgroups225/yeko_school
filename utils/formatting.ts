@@ -3,10 +3,18 @@
  *
  * @param {string} firstName - The first name of the person.
  * @param {string} lastName - The last name of the person.
+ * @param {string} email - The email of the person.
  * @returns {string} The full name in the format "FirstName LastName".
  */
-export function formatFullName(firstName: string, lastName: string): string {
-  return `${firstName} ${lastName}`
+export function formatFullName(firstName: string | null, lastName: string | null, email?: string | null): string {
+  const fullName: string[] = []
+  if ((!firstName || !firstName.length) && (!lastName || !lastName.length))
+    return (email && email.length) ? capitalizeFirstLetter(email.split('@')[0]) : 'Non renseigné'
+  if (firstName && firstName.length)
+    fullName.push(firstName)
+  if (lastName && lastName.length)
+    fullName.push(lastName)
+  return fullName.join(' ')
 }
 
 /**
@@ -53,4 +61,13 @@ export function truncateText(text: string, maxLength: number): string {
   if (text.length <= maxLength)
     return text
   return `${text.slice(0, maxLength - 3)}...`
+}
+
+/**
+ * Capitalize the first letter of a string.
+ * @param {string} text - The text to capitalize.
+ * @returns {string} The capitalized text.
+ */
+export function capitalizeFirstLetter(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1)
 }

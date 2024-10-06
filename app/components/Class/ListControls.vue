@@ -1,24 +1,21 @@
 <script setup lang="ts">
-import { STUDENT_COLUMNS } from '~/constants'
+import { CLASS_COLUMNS } from '~/constants'
 
 defineProps<{
-  itemsPerPage: number | number
+  itemsPerPage: number
   selectedRowsCount: number
   searchTerm: string
-  selectedClasses: string[]
-  hasNotParentFilterActive: boolean
-  hasNotClassFilterActive: boolean
+  hasNotMainTeacherActive: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'update:itemsPerPage', value: number): void
-  (e: 'update:selectedColumns', value: typeof STUDENT_COLUMNS): void
+  (e: 'update:selectedColumns', value: typeof CLASS_COLUMNS): void
   (e: 'resetFilters'): void
-  (e: 'hasNotParentFilter'): void
-  (e: 'hasNotClassFilter'): void
+  (e: 'hasNotMainTeacherFilter'): void
 }>()
 
-const selectedColumns = defineModel<typeof STUDENT_COLUMNS>('selectedColumns', { default: STUDENT_COLUMNS })
+const selectedColumns = defineModel<typeof CLASS_COLUMNS>('selectedColumns', { default: CLASS_COLUMNS })
 </script>
 
 <template>
@@ -34,8 +31,7 @@ const selectedColumns = defineModel<typeof STUDENT_COLUMNS>('selectedColumns', {
       />
     </div>
     <div class="flex gap-1.5 items-center">
-      <UButton leading-icon="i-carbon-user-favorite" trailing :color="!hasNotParentFilterActive ? 'black' : 'blue'" variant="outline" size="xs" label="Pas de parent" @click="emit('hasNotParentFilter')" />
-      <UButton leading-icon="i-heroicons-link-slash" trailing :color="!hasNotClassFilterActive ? 'black' : 'blue'" variant="outline" size="xs" label="Pas de classe" @click="emit('hasNotClassFilter')" />
+      <UButton leading-icon="i-carbon-user-favorite" trailing :color="!hasNotMainTeacherActive ? 'black' : 'blue'" variant="outline" size="xs" label="Pas de Prof Principal" @click="emit('hasNotMainTeacherFilter')" />
 
       <UDropdown v-if="selectedRowsCount > 1" :items="[]">
         <UButton
@@ -49,7 +45,7 @@ const selectedColumns = defineModel<typeof STUDENT_COLUMNS>('selectedColumns', {
       </UDropdown>
       <USelectMenu
         v-model="selectedColumns"
-        :options="STUDENT_COLUMNS"
+        :options="CLASS_COLUMNS"
         multiple
         @update:model-value="(value) => emit('update:selectedColumns', value)"
       >
@@ -65,7 +61,7 @@ const selectedColumns = defineModel<typeof STUDENT_COLUMNS>('selectedColumns', {
         icon="i-heroicons-funnel"
         color="gray"
         size="xs"
-        :disabled="searchTerm === '' && selectedClasses.length === 0"
+        :disabled="searchTerm === ''"
         @click="emit('resetFilters')"
       >
         Réinitialiser

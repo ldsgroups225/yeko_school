@@ -1,7 +1,7 @@
 /*
 import { serverSupabaseClient, serverSupabaseSession, serverSupabaseUser } from '#supabase/server'
 import { z } from 'zod'
-import { ERole, type IUserProfileDTO, roleToString } from '../../app/types'
+import { ERole, type IUserProfileDTO, roleToString } from '~~/types'
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'L\'email est invalide' }),

@@ -1,17 +1,16 @@
-import type { IStudentDTO } from '~~/types'
+import type { IClassDTO } from '~~/types'
 import { type ClientType, csServerSupabaseClient } from '~~/server/utils'
+import { formatFullName } from '~~/utils/formatting'
 import { z } from 'zod'
 
 /**
  * Schema for validating query parameters
  */
 const querySchema = z.object({
+  id: z.string().optional(),
   name: z.string().optional(),
-  idNumber: z.string().optional(),
-  classId: z.string().uuid().optional(),
+  gradeId: z.string().optional(),
   schoolId: z.string().uuid().optional(),
-  ageMin: z.string().regex(/^\d+$/).transform(Number).optional(),
-  ageMax: z.string().regex(/^\d+$/).transform(Number).optional(),
 })
 
 /**
@@ -55,33 +54,23 @@ async function validateAndParseQueryParams(query: unknown): Promise<ValidatedQue
  */
 function buildSupabaseQuery(client: ClientType, query: ValidatedQueryParams) {
   let supabaseQuery = client
-    .from('students')
+    .from('classes')
     .select(`
       *,
-      class:classes(name)
+      students(count),
+      users(first_name, last_name, email)
     `)
+    .order('grade_id')
+    .order('name')
 
   if (query.name) {
-    supabaseQuery = supabaseQuery.or(`first_name.ilike.%${query.name}%,last_name.ilike.%${query.name}%`)
+    supabaseQuery = supabaseQuery.ilike('name', `%${query.name}%`)
   }
-  if (query.idNumber) {
-    supabaseQuery = supabaseQuery.eq('id_number', query.idNumber)
-  }
-  if (query.classId) {
-    supabaseQuery = supabaseQuery.eq('class_id', query.classId)
+  if (query.gradeId) {
+    supabaseQuery = supabaseQuery.eq('grade_id', query.gradeId)
   }
   if (query.schoolId) {
     supabaseQuery = supabaseQuery.eq('school_id', query.schoolId)
-  }
-  if (query.ageMin) {
-    const minDate = new Date()
-    minDate.setFullYear(minDate.getFullYear() - query.ageMin)
-    supabaseQuery = supabaseQuery.lte('date_of_birth', minDate.toISOString())
-  }
-  if (query.ageMax) {
-    const maxDate = new Date()
-    maxDate.setFullYear(maxDate.getFullYear() - query.ageMax)
-    supabaseQuery = supabaseQuery.gte('date_of_birth', maxDate.toISOString())
   }
 
   return supabaseQuery
@@ -90,7 +79,7 @@ function buildSupabaseQuery(client: ClientType, query: ValidatedQueryParams) {
 /**
  * Main event handler for fetching students
  * @param {H3Event} event - The H3 event object
- * @returns {Promise<{ success: boolean; data: IStudentDTO[] }>} - The response object with fetched students
+ * @returns {Promise<{ success: boolean; data: IClassDTO[] }>} - The response object with fetched students
  * @throws {H3Error} - If an error occurs during the process
  */
 export default defineEventHandler(async (event) => {
@@ -102,33 +91,24 @@ export default defineEventHandler(async (event) => {
 
   // Build and execute the Supabase query
   const supabaseQuery = buildSupabaseQuery(client, query)
-  const { data: students, error } = await supabaseQuery
+  const { data: classes, error } = await supabaseQuery
 
   if (error) {
     console.error('[E_FETCH_STUDENTS]', error)
     throwI18nError('Erreur lors de la récupération des étudiants', 500)
   }
 
-  const parsedStudents = students.map((student) => {
+  const parsedClasses = classes.map((cls) => {
     return {
-      id: student.id,
-      parentId: student.parent_id,
-      schoolId: student.school_id,
-      classId: student.class_id,
-      className: student.class?.name,
-      idNumber: student.id_number,
-      firstName: student.first_name,
-      lastName: student.last_name,
-      dateOfBirth: student.date_of_birth,
-      gender: (student.gender ?? 'M') as 'M' | 'F',
-      address: student.address,
-      avatarUrl: student.avatar_url,
-      createdAt: student.created_at,
-      createdBy: student.created_by,
-      updatedAt: student.updated_at,
-      updatedBy: student.updated_by,
-    } satisfies IStudentDTO
+      id: cls.id,
+      name: cls.name,
+      gradeId: cls.grade_id,
+      schoolId: cls.school_id,
+      mainTeacherId: cls.main_teacher_id,
+      mainTeacherName: cls.users ? formatFullName(cls.users.first_name, cls.users.last_name, cls.users.email) : null,
+      studentCount: cls.students[0].count,
+    } satisfies IClassDTO
   })
 
-  return { success: true, data: parsedStudents }
+  return { success: true, data: parsedClasses }
 })

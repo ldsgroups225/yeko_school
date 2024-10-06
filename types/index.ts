@@ -172,6 +172,18 @@ export interface IStudentFiltersDTO {
 export interface IClassDTO {
   id?: string
   name: string
+  description?: string | null
+  gradeId?: number
+  schoolId?: string
+  mainTeacherId?: string | null
+  studentCount?: number
+}
+
+export interface IClassFiltersDTO {
+  name?: string
+  gradeId?: number
+  schoolId?: string
+  mainTeacherId?: string | null
 }
 
 export interface IGradeDTO {

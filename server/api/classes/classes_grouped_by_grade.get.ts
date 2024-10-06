@@ -1,4 +1,4 @@
-import type { Class } from '../../../types'
+import type { Class } from '~~/types'
 import { type ClientType, csServerSupabaseClient } from '~~/server/utils'
 import { z } from 'zod'
 

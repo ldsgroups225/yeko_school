@@ -4,10 +4,10 @@
  * @module AuthMeHandler
  */
 
-import type { ISchoolDTO, IUserProfileDTO } from '../../../types'
+import type { ISchoolDTO, IUserProfileDTO } from '~~/types'
 import { serverSupabaseUser } from '#supabase/server'
 import { csServerSupabaseClient } from '~~/server/utils'
-import { ERole, roleToString } from '../../../types'
+import { ERole, roleToString } from '~~/types'
 
 /**
  * Represents a user profile without the school property, but with a schoolId.

@@ -15,3 +15,11 @@ export const STUDENT_COLUMNS = [
   { key: 'className', label: 'Classe', sortable: true },
   { key: 'actions', label: 'Actions', sortable: false },
 ]
+
+export const CLASS_COLUMNS = [
+  { key: 'index', label: 'N°', sortable: true },
+  { key: 'name', label: 'Nom', sortable: true },
+  { key: 'mainTeacherId', label: 'Prof principal', sortable: true },
+  { key: 'studentCount', label: 'Nbr d\'élèves', sortable: true },
+  { key: 'actions', label: 'Actions', sortable: false },
+]
