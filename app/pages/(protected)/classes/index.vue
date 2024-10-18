@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IClassDTO } from '~~/types'
+import type { IClassDTO } from '~~/utils/validators'
 import { CLASS_COLUMNS, YEAR_OPTIONS } from '~/constants'
 
 // Store
@@ -58,7 +58,7 @@ onMounted(async () => {
       }"
     >
       <template #header>
-        <ClassListHeader :selected-year="selectedYear" :year-options="YEAR_OPTIONS" @open-create-or-update-class-modal="isCreateOrUpdateClassModalOpen = true" />
+        <ClassListHeader :selected-year="selectedYear" :classes :year-options="YEAR_OPTIONS" @open-create-or-update-class-modal="isCreateOrUpdateClassModalOpen = true" />
       </template>
 
       <ClassListFilters v-model:search-term="searchTerm" />
@@ -99,7 +99,7 @@ onMounted(async () => {
     <UModal v-model="isCreateOrUpdateClassModalOpen">
       <ClassForm
         v-if="isCreateOrUpdateClassModalOpen"
-        :cls="selectedClassForUpdate"
+        :cls="selectedClassForUpdate as IClassDTO"
         @close="isCreateOrUpdateClassModalOpen = false; selectedClassForUpdate = null"
       />
     </UModal>

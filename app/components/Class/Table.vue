@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IClassDTO } from '~~/types'
+import type { IClassDTO } from '~~/utils/validators'
 import type { CLASS_COLUMNS } from '~/constants'
 
 defineProps<{
