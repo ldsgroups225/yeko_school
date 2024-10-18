@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import type { IStudentDTO } from '~~/types'
 import { STUDENT_COLUMNS } from '~/constants'
 
-defineProps<{
+const props = defineProps<{
   itemsPerPage: number | number
-  selectedRowsCount: number
+  selectedRows: IStudentDTO[]
   searchTerm: string
   selectedClasses: string[]
   hasNotParentFilterActive: boolean
@@ -18,7 +19,24 @@ const emit = defineEmits<{
   (e: 'hasNotClassFilter'): void
 }>()
 
+const { removeStudentsFromClass, removeStudentsFromSchool } = useStudentStore()
+
 const selectedColumns = defineModel<typeof STUDENT_COLUMNS>('selectedColumns', { default: STUDENT_COLUMNS })
+
+const groupedActionDropdownItems = computed(() => [
+  [
+    { label: 'Les retiré de la classe', icon: 'i-heroicons-trash', click: handleRemoveStudentsFromClass },
+    { label: 'Les retiré de l\'école', icon: 'i-heroicons-trash', click: handleRemoveStudentsFromSchool },
+  ],
+])
+
+async function handleRemoveStudentsFromClass() {
+  await removeStudentsFromClass({ students: props.selectedRows })
+}
+
+async function handleRemoveStudentsFromSchool() {
+  await removeStudentsFromSchool({ students: props.selectedRows })
+}
 </script>
 
 <template>
@@ -37,7 +55,7 @@ const selectedColumns = defineModel<typeof STUDENT_COLUMNS>('selectedColumns', {
       <UButton leading-icon="i-carbon-user-favorite" trailing :color="!hasNotParentFilterActive ? 'black' : 'blue'" variant="outline" size="xs" label="Pas de parent" @click="emit('hasNotParentFilter')" />
       <UButton leading-icon="i-heroicons-link-slash" trailing :color="!hasNotClassFilterActive ? 'black' : 'blue'" variant="outline" size="xs" label="Pas de classe" @click="emit('hasNotClassFilter')" />
 
-      <UDropdown v-if="selectedRowsCount > 1" :items="[]">
+      <UDropdown v-if="selectedRows.length > 1" :items="groupedActionDropdownItems">
         <UButton
           icon="i-heroicons-chevron-down"
           trailing

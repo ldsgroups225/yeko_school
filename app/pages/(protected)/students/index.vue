@@ -108,7 +108,7 @@ onMounted(async () => {
       <StudentListControls
         v-model:items-per-page="itemsPerPage"
         v-model:selected-columns="selectedColumns"
-        :selected-rows-count="selectedRows.length"
+        :selected-rows="selectedRows"
         :search-term="searchTerm"
         :selected-classes="selectedClasses"
         :has-not-parent-filter-active="hasNotParentFilter"

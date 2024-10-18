@@ -4,6 +4,7 @@
  */
 
 import type { IStudentDTO, IStudentFiltersDTO } from '~~/types'
+import type { Database } from '~~/types/database.types'
 import type { IEditingStudentDTO } from '~~/utils/validators'
 import { defineStore } from 'pinia'
 
@@ -59,10 +60,10 @@ export const useStudentStore = defineStore('student', {
      * @returns {(id: string) => IStudentDTO | undefined} Function to get a student by ID.
      */
     getStudentById: (state) => {
-    /**
-     * @param {string} id - The ID of the student to retrieve.
-     * @returns {IStudentDTO | undefined} The student with the given ID, or undefined if not found.
-     */
+      /**
+       * @param {string} id - The ID of the student to retrieve.
+       * @returns {IStudentDTO | undefined} The student with the given ID, or undefined if not found.
+       */
       return (id: string) => {
         return state.students.find(student => student.id === id)
       }
@@ -232,6 +233,78 @@ export const useStudentStore = defineStore('student', {
       catch (e) {
         const _e = e
         this.error = 'An unexpected error occurred'
+        return false
+      }
+      finally {
+        this.isLoading = false
+      }
+    },
+
+    async removeStudentsFromClass({ students }: { students: IStudentDTO[] }): Promise<boolean> {
+      this.isLoading = true
+      this.error = null
+
+      const supabase = useSupabaseClient<Database>()
+
+      try {
+        const { error } = await supabase.from('students').update({ class_id: null }).in('id', students.map(s => s.id))
+
+        if (error) {
+          this.error = error.message || 'Erreur lors du retrait des élèves de la classe'
+          return false
+        }
+
+        // If the linking was successful, we might want to refresh the student data
+        for (const std of students) {
+          const index = this.students.findIndex(s => s.id === std.id)
+          if (index !== -1) {
+            this.students[index] = { ...std, classId: null, className: null }
+          }
+          if (this.currentStudent && this.currentStudent.id === std.id) {
+            this.currentStudent = { ...std, classId: null, className: null }
+          }
+        }
+
+        return true
+      }
+      catch (e) {
+        this.error = `An unexpected error occurred: ${e}`
+        return false
+      }
+      finally {
+        this.isLoading = false
+      }
+    },
+
+    async removeStudentsFromSchool({ students }: { students: IStudentDTO[] }): Promise<boolean> {
+      this.isLoading = true
+      this.error = null
+
+      const supabase = useSupabaseClient<Database>()
+
+      try {
+        const { error } = await supabase.from('students').update({ school_id: null, class_id: null }).in('id', students.map(s => s.id))
+
+        if (error) {
+          this.error = error.message || 'Erreur lors du retrait des élèves de l\'école'
+          return false
+        }
+
+        // If the linking was successful, we might want to refresh the student data
+        for (const std of students) {
+          const index = this.students.findIndex(s => s.id === std.id)
+          if (index !== -1) {
+            this.students[index] = { ...std, schoolId: null, classId: null, className: null }
+          }
+          if (this.currentStudent && this.currentStudent.id === std.id) {
+            this.currentStudent = { ...std, schoolId: null, classId: null, className: null }
+          }
+        }
+
+        return true
+      }
+      catch (e) {
+        this.error = `An unexpected error occurred: ${e}`
         return false
       }
       finally {
