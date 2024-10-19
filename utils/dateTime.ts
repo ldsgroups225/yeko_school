@@ -1,4 +1,4 @@
-import { DATE_FORMAT, TIME_FORMAT } from '~~/config/constants'
+import { DATE_FORMAT_SHORT, TIME_FORMAT_24H } from '~~/config/constants'
 import {
   differenceInMinutes,
   differenceInYears,
@@ -40,7 +40,7 @@ function formatDateWithOptions(date: DateInput, formatString: string, options?: 
  * @returns {string} The formatted date string.
  */
 export function formatDate(date: DateInput): string {
-  return formatDateWithOptions(date, DATE_FORMAT, { locale: fr })
+  return formatDateWithOptions(date, DATE_FORMAT_SHORT, { locale: fr })
 }
 
 /**
@@ -56,7 +56,7 @@ export function formatTime(date: DateInput): string {
     if (date.length === 8)
       return date.substring(0, 5)
   }
-  return formatDateWithOptions(date, TIME_FORMAT)
+  return formatDateWithOptions(date, TIME_FORMAT_24H)
 }
 
 /**
@@ -66,7 +66,7 @@ export function formatTime(date: DateInput): string {
  * @param {string} formatString - The format string to use for parsing.
  * @returns {Date | null} The parsed Date object, or null if the parsing fails.
  */
-function parseStringToDate(dateString: string, formatString: string): Date | null {
+export function parseStringToDate(dateString: string, formatString: string): Date | null {
   const parsedDate = parse(dateString, formatString, new Date())
   return isValid(parsedDate) ? parsedDate : null
 }
@@ -78,7 +78,17 @@ function parseStringToDate(dateString: string, formatString: string): Date | nul
  * @returns {Date | null} The parsed Date object, or null if the parsing fails.
  */
 export function parseDate(dateString: string): Date | null {
-  return parseStringToDate(dateString, DATE_FORMAT)
+  return parseStringToDate(dateString, DATE_FORMAT_SHORT)
+}
+
+/**
+ * Parse date string in French format (DD/MM/YYYY) to Date object.
+ *
+ * @param {string} dateString - The date string to parse (e.g., "01/01/1970").
+ * @returns {Date | null} The parsed Date object, or null if the parsing fails.
+ */
+export function parseFrenchDate(dateString: string): Date | null {
+  return parseStringToDate(dateString, 'dd/MM/yyyy')
 }
 
 /**
@@ -88,7 +98,7 @@ export function parseDate(dateString: string): Date | null {
  * @returns {Date | null} The parsed Date object, or null if the parsing fails.
  */
 export function parseTime(timeString: string): Date | null {
-  return parseStringToDate(timeString, TIME_FORMAT)
+  return parseStringToDate(timeString, TIME_FORMAT_24H)
 }
 
 /**

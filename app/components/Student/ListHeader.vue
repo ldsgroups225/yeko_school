@@ -13,7 +13,11 @@ const selectedYear = toRef(props, 'selectedYear')
       Liste des étudiants
     </h2>
     <div class="flex items-center space-x-2">
-      <UButton variant="outline" icon="i-heroicons-users" />
+      <StudentDataManager />
+
+      <UTooltip text="Nouvelle classe" :popper="{ placement: 'bottom' }">
+        <UButton variant="outline" icon="i-heroicons-users" />
+      </UTooltip>
       <USelectMenu v-model="selectedYear" :options="yearOptions" />
     </div>
   </div>

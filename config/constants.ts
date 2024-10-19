@@ -26,8 +26,13 @@ export const ANIMATION_DURATION = 300 // 300 milliseconds
 export const MAX_PARTICIPATION_COUNT = 5
 
 // Date formats
-export const DATE_FORMAT = 'P'
-export const TIME_FORMAT = 'HH:mm'
+export const DATE_FORMAT_SHORT = 'P'
+export const TIME_FORMAT_24H = 'HH:mm'
+
+export enum DateFormat {
+  SHORT = 'P',
+  TIME_24H = 'HH:mm',
+}
 
 // QR Code
 export const QR_CODE_PREFIX = 'YEKO_'
