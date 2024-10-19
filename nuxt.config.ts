@@ -7,29 +7,15 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@vueuse/nuxt',
     '@pinia/nuxt',
-    '@nuxtjs/color-mode',
     '@vite-pwa/nuxt',
     '@nuxt/eslint',
     '@nuxtjs/i18n',
-    '@nuxt/fonts',
     '@nuxtjs/supabase',
     '@nuxt/image',
   ],
 
   image: {
     format: ['webp'],
-  },
-
-  fonts: {
-    families: [
-      {
-        name: 'Poppins',
-        provider: 'google',
-        weights: [400, 500, 600, 700],
-        styles: ['normal'],
-        subsets: ['latin'],
-      },
-    ],
   },
 
   supabase: {
@@ -52,9 +38,10 @@ export default defineNuxtConfig({
     typedPages: true,
   },
 
-  colorMode: {
-    classSuffix: '',
-  },
+  // colorMode: {
+  //   // classSuffix: '',
+  //   preference: 'system',
+  // },
 
   nitro: {
     esbuild: {

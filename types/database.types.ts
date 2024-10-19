@@ -793,7 +793,7 @@ export interface Database {
           id: string
           id_number: string
           last_name: string
-          parent_id: string
+          parent_id: string | null
           school_id: string | null
           updated_at: string | null
           updated_by: string | null
@@ -810,7 +810,7 @@ export interface Database {
           id?: string
           id_number: string
           last_name: string
-          parent_id: string
+          parent_id: string | null
           school_id?: string | null
           updated_at?: string | null
           updated_by?: string | null
@@ -827,7 +827,7 @@ export interface Database {
           id?: string
           id_number?: string
           last_name?: string
-          parent_id?: string
+          parent_id?: string | null
           school_id?: string | null
           updated_at?: string | null
           updated_by?: string | null
