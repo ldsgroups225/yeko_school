@@ -20,13 +20,34 @@ const emit = defineEmits<{
 }>()
 
 const { removeStudentsFromClass, removeStudentsFromSchool } = useStudentStore()
-
 const selectedColumns = defineModel<typeof STUDENT_COLUMNS>('selectedColumns', { default: STUDENT_COLUMNS })
+
+const {
+  isConfirmDialogOpen,
+  confirmDialogConfig,
+  openConfirmDialog,
+} = useConfirmDialog()
 
 const groupedActionDropdownItems = computed(() => [
   [
-    { label: 'Les retiré de la classe', icon: 'i-heroicons-trash', click: handleRemoveStudentsFromClass },
-    { label: 'Les retiré de l\'école', icon: 'i-heroicons-trash', click: handleRemoveStudentsFromSchool },
+    {
+      label: 'Les retirer de la classe',
+      icon: 'i-heroicons-trash',
+      click: () => openConfirmDialog({
+        title: 'Confirmer le retrait de la classe',
+        message: `Êtes-vous sûr de vouloir retirer ces ${props.selectedRows.length} élèves de leur classe actuelle ?`,
+        onConfirm: handleRemoveStudentsFromClass,
+      }),
+    },
+    {
+      label: 'Les retirer de l\'école',
+      icon: 'i-heroicons-trash',
+      click: () => openConfirmDialog({
+        title: 'Confirmer le retrait de l\'école',
+        message: `Êtes-vous sûr de vouloir retirer ces ${props.selectedRows.length} élèves de l'école ? Cette action est irréversible.`,
+        onConfirm: handleRemoveStudentsFromSchool,
+      }),
+    },
   ],
 ])
 
@@ -54,7 +75,6 @@ async function handleRemoveStudentsFromSchool() {
     <div class="flex gap-1.5 items-center">
       <UButton leading-icon="i-carbon-user-favorite" trailing :color="!hasNotParentFilterActive ? 'black' : 'blue'" variant="outline" size="xs" label="Pas de parent" @click="emit('hasNotParentFilter')" />
       <UButton leading-icon="i-heroicons-link-slash" trailing :color="!hasNotClassFilterActive ? 'black' : 'blue'" variant="outline" size="xs" label="Pas de classe" @click="emit('hasNotClassFilter')" />
-
       <UDropdown v-if="selectedRows.length > 1" :items="groupedActionDropdownItems">
         <UButton
           icon="i-heroicons-chevron-down"
@@ -89,5 +109,12 @@ async function handleRemoveStudentsFromSchool() {
         Réinitialiser
       </UButton>
     </div>
+
+    <ConfirmDialog
+      v-model="isConfirmDialogOpen"
+      :title="confirmDialogConfig.title"
+      :message="confirmDialogConfig.message"
+      :on-confirm="async () => confirmDialogConfig.onConfirm()"
+    />
   </div>
 </template>
