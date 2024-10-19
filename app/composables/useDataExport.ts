@@ -1,7 +1,7 @@
 import Papa from 'papaparse'
 
 export function useDataExport() {
-  function exportToCsv(data: any[]) {
+  function exportToCsv(data: any[], name: string = 'data') {
     if (data.length === 0) {
       return {
         success: false,
@@ -15,7 +15,7 @@ export function useDataExport() {
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob)
       link.setAttribute('href', url)
-      link.setAttribute('download', 'exported_data.csv')
+      link.setAttribute('download', `exported_${name}.csv`)
       link.style.visibility = 'hidden'
       document.body.appendChild(link)
       link.click()

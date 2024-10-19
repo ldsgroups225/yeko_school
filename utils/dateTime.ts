@@ -7,7 +7,7 @@ import {
   parse,
   parseISO,
 } from 'date-fns'
-import { fr } from 'date-fns/locale'
+import { enUS, fr } from 'date-fns/locale'
 
 type DateInput = Date | string
 
@@ -39,8 +39,8 @@ function formatDateWithOptions(date: DateInput, formatString: string, options?: 
  * @param {DateInput} date - The Date object or date string to format.
  * @returns {string} The formatted date string.
  */
-export function formatDate(date: DateInput): string {
-  return formatDateWithOptions(date, DATE_FORMAT_SHORT, { locale: fr })
+export function formatDate(date: DateInput, format: string = DATE_FORMAT_SHORT, locale: 'fr' | 'en' = 'fr'): string {
+  return formatDateWithOptions(date, format, { locale: locale === 'fr' ? fr : enUS })
 }
 
 /**
@@ -77,8 +77,8 @@ export function parseStringToDate(dateString: string, formatString: string): Dat
  * @param {string} dateString - The date string to parse.
  * @returns {Date | null} The parsed Date object, or null if the parsing fails.
  */
-export function parseDate(dateString: string): Date | null {
-  return parseStringToDate(dateString, DATE_FORMAT_SHORT)
+export function parseDate(dateString: string, format: string = DATE_FORMAT_SHORT): Date | null {
+  return parseStringToDate(dateString, format)
 }
 
 /**
