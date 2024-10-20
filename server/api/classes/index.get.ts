@@ -106,7 +106,7 @@ export default defineEventHandler(async (event) => {
       schoolId: cls.school_id,
       mainTeacherId: cls.main_teacher_id,
       mainTeacherName: cls.users ? formatFullName(cls.users.first_name, cls.users.last_name, cls.users.email) : null,
-      studentCount: cls.students[0].count,
+      studentCount: cls.students[0]?.count || 0,
     } satisfies IClassDTO
   })
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { classSchema, type IClassDTO } from '~~/utils/validators'
+import { classSchema, type ICreateClassDTO } from '~~/utils/validators'
 
 const { classes } = defineProps<{
-  classes?: IClassDTO[]
+  classes?: ICreateClassDTO[]
 }>()
 
 const isModalOpen = ref(false)
@@ -13,13 +13,12 @@ function openModal(mode: 'upload' | 'download') {
   isModalOpen.value = true
 }
 
-async function handleClassUpload(data: IClassDTO[]) {
+async function handleClassUpload(data: ICreateClassDTO[]) {
+  const _data = data // TODO: remove it
   try {
     // Here you would typically send the data to your backend API
-    console.log('Uploading user data:', data)
     // Simulate an API call
     await new Promise(resolve => setTimeout(resolve, 1000))
-    console.log('Class data uploaded successfully')
   }
   catch (error) {
     console.error('Error uploading user data:', error)
@@ -27,7 +26,7 @@ async function handleClassUpload(data: IClassDTO[]) {
   }
 }
 
-async function handleClassDownload(): Promise<IClassDTO[]> {
+async function handleClassDownload(): Promise<ICreateClassDTO[]> {
   try {
     await new Promise(resolve => setTimeout(resolve, 1000))
     return classes ?? []

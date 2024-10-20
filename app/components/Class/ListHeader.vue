@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { IClassDTO } from '~~/utils/validators'
+import type { ICreateClassDTO } from '~~/utils/validators'
 
 const props = defineProps<{
   selectedYear: string
-  classes?: IClassDTO[]
+  classes?: ICreateClassDTO[]
   yearOptions: { label: string, value: string }[]
 }>()
 

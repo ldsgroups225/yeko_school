@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IClassDTO } from '~~/utils/validators'
+import type { ICreateClassDTO } from '~~/utils/validators'
 import { CLASS_COLUMNS, YEAR_OPTIONS } from '~/constants'
 
 // Store
@@ -12,7 +12,7 @@ const selectedYear = ref('2024 2025')
 const selectedColumns = ref(CLASS_COLUMNS)
 const isLinkModalOpen = ref(false)
 const isCreateOrUpdateClassModalOpen = ref(false)
-const selectedClassForUpdate = ref<IClassDTO | null>(null)
+const selectedClassForUpdate = ref<ICreateClassDTO | null>(null)
 
 // Composables
 const {
@@ -30,7 +30,7 @@ const {
   searchTerm,
   resetFilters,
   hasNotMainTeacherFilter,
-} = useClassTableState<IClassDTO>(classes)
+} = useClassTableState<ICreateClassDTO>(classes)
 
 const {
   isConfirmDialogOpen,
@@ -99,7 +99,7 @@ onMounted(async () => {
     <UModal v-model="isCreateOrUpdateClassModalOpen">
       <ClassForm
         v-if="isCreateOrUpdateClassModalOpen"
-        :cls="selectedClassForUpdate as IClassDTO"
+        :cls="selectedClassForUpdate as ICreateClassDTO"
         @close="isCreateOrUpdateClassModalOpen = false; selectedClassForUpdate = null"
       />
     </UModal>

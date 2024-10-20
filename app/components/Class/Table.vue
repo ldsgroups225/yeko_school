@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import type { IClassDTO } from '~~/utils/validators'
+import type { ICreateClassDTO } from '~~/utils/validators'
 import type { CLASS_COLUMNS } from '~/constants'
 
 defineProps<{
-  rows: IClassDTO[]
+  rows: ICreateClassDTO[]
   columns: typeof CLASS_COLUMNS
   loading: boolean
   pageFrom: number
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:selectedRows', value: IClassDTO[]): void
+  (e: 'update:selectedRows', value: ICreateClassDTO[]): void
   (e: 'update:sort', value: { column: string, direction: 'asc' | 'desc' } | null): void
-  (e: 'showCreateOrUpdateModal', value: IClassDTO): void
-  (e: 'select', value: IClassDTO): void
+  (e: 'showCreateOrUpdateModal', value: ICreateClassDTO): void
+  (e: 'select', value: ICreateClassDTO): void
 }>()
-const selectedRows = defineModel<IClassDTO[]>('selectedRows', { default: [] })
+const selectedRows = defineModel<ICreateClassDTO[]>('selectedRows', { default: [] })
 const sort = defineModel<{ column: string, direction: 'asc' | 'desc' }>('sort')
 
-function getActionItems(row: IClassDTO) {
+function getActionItems(row: ICreateClassDTO) {
   return [
     [
       {

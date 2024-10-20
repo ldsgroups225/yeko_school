@@ -127,7 +127,7 @@ export interface IControlNoteDTO {
 
 export interface IStudentDTO {
   id: string
-  parentId: string
+  parentId: string | null
   schoolId: string | null
   classId: string | null
   className?: string | null
@@ -176,6 +176,7 @@ export interface IClassDTO {
   gradeId?: number
   schoolId?: string
   mainTeacherId?: string | null
+  mainTeacherName?: string | null
   studentCount?: number
 }
 

@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { IStudentDTO } from '~~/types'
+import type { Database } from '~~/types/database.types'
 import { formatDate, getAge } from '~~/utils/dateTime.js'
 import { STUDENT_COLUMNS, YEAR_OPTIONS } from '~/constants'
 
 // Store
 const { userData } = useUserStore()
 const studentStore = useStudentStore()
-const { fetchStudents, updateStudent } = studentStore
+const { fetchStudents, updateStudent, updateLocalStudentList } = studentStore
 const { students, isLoading, error } = storeToRefs(studentStore)
 
 // State
@@ -16,7 +17,15 @@ const selectedColumns = ref(STUDENT_COLUMNS)
 const isLinkModalOpen = ref(false)
 const selectedStudentForLink = ref<{ id: string, name: string } | null>(null)
 const isUpdateModalOpen = ref(false)
+const isAssignClassModalOpen = ref(false)
 const selectedStudentForUpdate = ref<IStudentDTO | null>(null)
+const selectedStudentForAssignClass = ref<string>('')
+const selectedClassToAssign = ref<{ id: string, label: string, click?: () => void }>({ id: '', label: '' })
+
+const toast = useToast()
+
+// Supebase client
+const supabase = useSupabaseClient<Database>()
 
 // Composables
 const {
@@ -73,6 +82,50 @@ const gradeHasSelectedSubclass = computed(() => {
   }
 })
 
+async function handleAssignClass() {
+  const studentId = selectedStudentForAssignClass.value
+  const classId = toRaw(selectedClassToAssign.value).id
+
+  if (!userData || !userData?.school) {
+    throw new Error('Unauthorized')
+  }
+
+  const { error: classAssignmentError } = await supabase
+    .from('students')
+    .update({ class_id: classId })
+    .eq('school_id', userData?.school?.id)
+    .eq('id', studentId)
+
+  if (classAssignmentError) {
+    toast.add({
+      title: 'Erreur',
+      description: 'Oups, nous n\'avons pas pu assigner cet élève à la classe sélectionnée.',
+      color: 'red',
+      timeout: 7000,
+      icon: 'heroicons:exclamation-triangle',
+    })
+
+    return
+  }
+
+  updateLocalStudentList({ id: studentId, classId, className: selectedClassToAssign.value.label })
+  toast.add({
+    title: 'Succès',
+    description: 'L\'élève a bien été assigné à la classe sélectionnée.',
+    color: 'emerald',
+  })
+
+  isAssignClassModalOpen.value = false
+  selectedClassToAssign.value = { id: '', label: '', click: () => {} }
+  selectedStudentForAssignClass.value = ''
+}
+
+function onSelect(option: { click: () => void }) {
+  if (option.click) {
+    option.click()
+  }
+}
+
 // Lifecycle
 onMounted(async () => {
   await fetchStudents()
@@ -128,6 +181,7 @@ onMounted(async () => {
         @select="selectRow"
         @show-link-modal="(student) => { selectedStudentForLink = student; isLinkModalOpen = true }"
         @show-update-modal="(student) => { selectedStudentForUpdate = student; isUpdateModalOpen = true }"
+        @show-assign-class-modal="(studentId) => { selectedStudentForAssignClass = studentId; isAssignClassModalOpen = true }"
         @remove-from-class="handleRemoveStudentFromClass"
         @remove-from-school="handleRemoveStudentFromSchool"
       >
@@ -166,6 +220,17 @@ onMounted(async () => {
         v-if="selectedStudentForUpdate"
         :student="selectedStudentForUpdate"
         @close="isUpdateModalOpen = false; selectedStudentForUpdate = null"
+      />
+    </UModal>
+
+    <UModal v-model="isAssignClassModalOpen">
+      <UCommandPalette
+        v-model="selectedClassToAssign"
+        :autoselect="false"
+        placeholder="Rechercher une classe"
+        :empty-state="{ icon: 'i-heroicons-magnifying-glass-20-solid', label: 'Aucune classe trouvée', queryLabel: 'Nous n\'avons trouvé aucune classe correspondante à votre recherche' }"
+        :groups="[{ key: 'classes', commands: classes?.data.flatMap(item => item.subclasses.map(subclass => ({ label: subclass.name, id: subclass.id, click: () => handleAssignClass() }))) }]"
+        @update:model-value="onSelect"
       />
     </UModal>
 

@@ -47,7 +47,7 @@ async function validateAndParseData(data: any): Promise<ICreateClassDTO> {
 async function createClass(client: ClientType, data: ICreateClassDTO) {
   const { data: newClassData, error } = await client
     .from('classes')
-    .insert(convertCase({ ...data }, 'snakeCase'))
+    .insert(convertCase({ ...data }, 'snakeCase') as any)
     .select('*, users(first_name, last_name, email)')
     .single()
 
@@ -59,9 +59,9 @@ async function createClass(client: ClientType, data: ICreateClassDTO) {
     })
   }
 
-  const _newClassData = {
+  const _newClassData: any = {
     ...newClassData,
-    mainTeacherName: formatFullName(newClassData.users.first_name, newClassData.users.last_name, newClassData.users.email),
+    mainTeacherName: formatFullName(newClassData.users!.first_name, newClassData.users!.last_name, newClassData.users!.email),
     studentCount: 0,
   }
 
@@ -93,7 +93,7 @@ export default defineEventHandler(async (event) => {
       data: convertCase(newClass, 'camelCase') as unknown as IClassDTO,
     }
   }
-  catch (error: H3Error) {
+  catch (error: any) {
     console.error('[E_CLASS_OPERATION]', error.message)
     return {
       success: false,

@@ -3,10 +3,10 @@ import type { Database } from '~~/types/database.types'
 import { ERole } from '~~/types'
 import { formatFullName } from '~~/utils/formatting'
 import { getChangedFields } from '~~/utils/getChangedFields'
-import { classSchema, type IClassDTO, type IUpdateClassDTO, updateClassSchema } from '~~/utils/validators'
+import { classSchema, type ICreateClassDTO, type IUpdateClassDTO, updateClassSchema } from '~~/utils/validators'
 
 const { cls } = defineProps<{
-  cls?: IClassDTO
+  cls?: ICreateClassDTO
 }>()
 
 const emit = defineEmits(['close'])
@@ -94,7 +94,7 @@ async function handleSubmit() {
     if (cls)
       _success = await updateClass(cls.id!, changedFields)
     else
-      _success = await createClass(form.value as IClassDTO)
+      _success = await createClass(form.value as ICreateClassDTO)
 
     if (_success) {
       emit('close')

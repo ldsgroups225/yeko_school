@@ -3,7 +3,7 @@
  * @description Defines and exports the class store for managing class data and operations.
  */
 import type { IClassFiltersDTO } from '~~/types'
-import type { IClassDTO, IUpdateClassDTO } from '~~/utils/validators'
+import type { ICreateClassDTO, IUpdateClassDTO } from '~~/utils/validators'
 import { defineStore } from 'pinia'
 
 /**
@@ -12,16 +12,16 @@ import { defineStore } from 'pinia'
  */
 interface ClassState {
   /** @property {IClassDTO[]} classes - Array of class data. */
-  classes: IClassDTO[]
+  classes: ICreateClassDTO[]
   /** @property {IClassDTO | null} currentClass - Currently selected class. */
-  currentClass: IClassDTO | null
+  currentClass: ICreateClassDTO | null
   /** @property {boolean} isLoading - Loading state flag. */
   isLoading: boolean
   /** @property {string | null} error - Error message, if any. */
   error: string | null
 }
 
-interface ResponseType { success: boolean, message: any, data: IClassDTO | null }
+interface ResponseType { success: boolean, message: any, data: ICreateClassDTO | null }
 
 /**
  * @constant
@@ -57,7 +57,7 @@ export const useClassStore = defineStore('class', {
 
       const _filterByUserSchool = { ...filters, schoolId: userData?.school?.id }
 
-      const { data, status, error } = await useFetch<{ success: boolean, data: IClassDTO[] }>('/api/classes', {
+      const { data, status, error } = await useFetch<{ success: boolean, data: ICreateClassDTO[] }>('/api/classes', {
         query: _filterByUserSchool,
       })
 
@@ -82,7 +82,7 @@ export const useClassStore = defineStore('class', {
       this.isLoading = true
       this.error = null
 
-      const { data, status, error } = await useFetch<{ success: boolean, data: IClassDTO }>(`/api/classes/${id}`)
+      const { data, status, error } = await useFetch<{ success: boolean, data: ICreateClassDTO }>(`/api/classes/${id}`)
 
       if (error.value) {
         this.error = error.value.message || `An error occurred while fetching class with ID ${id}`
@@ -99,10 +99,10 @@ export const useClassStore = defineStore('class', {
      * @async
      * @function createClass
      * @description Creates a new class.
-     * @param {IClassDTO} classData - The data for the new class.
+     * @param {ICreateClassDTO} classData - The data for the new class.
      * @returns {Promise<boolean>} True if the class was created successfully, false otherwise.
      */
-    async createClass(classData: IClassDTO): Promise<boolean> {
+    async createClass(classData: ICreateClassDTO): Promise<boolean> {
       this.isLoading = true
       this.error = null
 
@@ -117,7 +117,7 @@ export const useClassStore = defineStore('class', {
           return false
         }
         else if (success) {
-          this.classes.push(data)
+          this.classes.push(data!)
           this.classes = this.classes.sort((a, b) => a.gradeId - b.gradeId).sort((a, b) => a.name.localeCompare(b.name))
           return true
         }
@@ -160,7 +160,7 @@ export const useClassStore = defineStore('class', {
         else if (success) {
           const index = this.classes.findIndex(c => c.id === id)
           if (index !== -1) {
-            this.classes[index] = data
+            this.classes[index] = data!
           }
           return true
         }

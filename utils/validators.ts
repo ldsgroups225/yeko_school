@@ -25,7 +25,7 @@ export const classSchema = z.object({
   studentCount: z.number().int().optional(),
 })
 
-export type IClassDTO = z.infer<typeof classSchema>
+export type ICreateClassDTO = z.infer<typeof classSchema>
 
 export const updateClassSchema = classSchema.partial().refine(data => Object.values(data).some(value => value !== undefined), {
   message: 'Il faut au moins un champ à mettre à jour',

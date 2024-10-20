@@ -72,6 +72,31 @@ export const useStudentStore = defineStore('student', {
 
   actions: {
     /**
+     * @function updateLocalStudentList
+     * @description Updates the local student list and the current student if applicable.
+     * @param {Partial<IStudentDTO>} updatedStudentData - The updated student data (partial).
+     */
+    updateLocalStudentList(updatedStudentData: Partial<IStudentDTO>) {
+      if (!updatedStudentData.id) {
+        console.error('Student ID is required for updating local student list')
+        return
+      }
+
+      const index = this.students.findIndex(s => s.id === updatedStudentData.id)
+      const isCreation = index === -1
+
+      if (isCreation) {
+        this.students.push(updatedStudentData as any)
+      }
+      else {
+        this.students[index] = { ...this.students[index], ...updatedStudentData } as any
+        if (this.currentStudent && this.currentStudent.id === updatedStudentData.id) {
+          this.currentStudent = { ...this.currentStudent, ...updatedStudentData }
+        }
+      }
+    },
+
+    /**
      * @async
      * @function fetchStudents
      * @description Fetches students based on optional filters.
@@ -146,15 +171,7 @@ export const useStudentStore = defineStore('student', {
         }
 
         if (success) {
-          // If the linking was successful, we might want to refresh the student data
-          const index = this.students.findIndex(s => s.id === id)
-          if (index !== -1) {
-            this.students[index] = updatedStudent
-          }
-          if (this.currentStudent && this.currentStudent.id === id) {
-            this.currentStudent = updatedStudent
-          }
-
+          this.updateLocalStudentList(updatedStudent)
           return true
         }
         else {
@@ -182,7 +199,7 @@ export const useStudentStore = defineStore('student', {
       this.isLoading = true
       this.error = null
 
-      const { data, pending, error } = await useFetch<{ success: boolean, data: IStudentDTO }>('/api/students', {
+      const { data, status, error } = await useFetch<{ success: boolean, data: IStudentDTO }>('/api/students', {
         method: 'POST',
         body: studentData,
       })
@@ -192,10 +209,10 @@ export const useStudentStore = defineStore('student', {
         console.error('Error creating student:', error.value)
       }
       else if (data.value && data.value.success) {
-        this.students.push(data.value.data)
+        this.updateLocalStudentList(data.value.data)
       }
 
-      this.isLoading = pending.value
+      this.isLoading = status.value === 'pending'
     },
 
     /**
@@ -256,13 +273,7 @@ export const useStudentStore = defineStore('student', {
 
         // If the linking was successful, we might want to refresh the student data
         for (const std of students) {
-          const index = this.students.findIndex(s => s.id === std.id)
-          if (index !== -1) {
-            this.students[index] = { ...std, classId: null, className: null }
-          }
-          if (this.currentStudent && this.currentStudent.id === std.id) {
-            this.currentStudent = { ...std, classId: null, className: null }
-          }
+          this.updateLocalStudentList({ id: std.id, classId: null, className: null })
         }
 
         return true
@@ -292,13 +303,7 @@ export const useStudentStore = defineStore('student', {
 
         // If the linking was successful, we might want to refresh the student data
         for (const std of students) {
-          const index = this.students.findIndex(s => s.id === std.id)
-          if (index !== -1) {
-            this.students[index] = { ...std, schoolId: null, classId: null, className: null }
-          }
-          if (this.currentStudent && this.currentStudent.id === std.id) {
-            this.currentStudent = { ...std, schoolId: null, classId: null, className: null }
-          }
+          this.updateLocalStudentList({ id: std.id, schoolId: null, classId: null, className: null })
         }
 
         return true

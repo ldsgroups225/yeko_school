@@ -32,7 +32,7 @@ function validateClassId(id: string | undefined): string {
     })
   }
 
-  return id
+  return id || ''
 }
 
 /**
@@ -119,10 +119,10 @@ async function updateClass(client: ClientType, id: string, data: IUpdateClassDTO
     })
   }
 
-  const _newClassData = {
+  const _newClassData: any = {
     ...newClassData,
-    mainTeacherName: formatFullName(newClassData.users.first_name, newClassData.users.last_name, newClassData.users.email),
-    studentCount: newClassData.students[0].count,
+    mainTeacherName: formatFullName(newClassData.users!.first_name, newClassData.users!.last_name, newClassData.users!.email),
+    studentCount: newClassData.students[0]?.count || 0,
   }
 
   delete _newClassData.students
@@ -171,7 +171,7 @@ export default defineEventHandler(async (event) => {
       })
     }
   }
-  catch (error: H3Error) {
+  catch (error: any) {
     console.error('[E_CLASS_OPERATION]', error.message)
     return {
       success: false,

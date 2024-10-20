@@ -19,6 +19,7 @@ const emit = defineEmits<{
   (e: 'showUpdateModal', value: IStudentDTO): void
   (e: 'removeFromClass', value: string): void
   (e: 'removeFromSchool', value: string): void
+  (e: 'showAssignClassModal', value: string): void
 }>()
 const selectedRows = defineModel<IStudentDTO[]>('selectedRows', { default: [] })
 const sort = defineModel<{ column: string, direction: 'asc' | 'desc' }>('sort')
@@ -38,6 +39,10 @@ function getActionItems(row: IStudentDTO) {
           emit('select', row)
           emit('showUpdateModal', row)
         },
+      },
+      {
+        label: 'Attribuer à une classe',
+        slot: 'assign-class',
       },
       {
         label: 'Lier à son parent',
@@ -85,6 +90,19 @@ function getActionItems(row: IStudentDTO) {
     <template #actions-data="{ row }">
       <UDropdown :items="getActionItems(row)">
         <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
+
+        <template #assign-class>
+          <UButton
+            color="gray"
+            variant="ghost"
+            label="Attribuer à une classe"
+            class="w-full"
+            icon="i-heroicons-link-20-solid"
+            :padded="false"
+            :ui="{ color: { gray: { ghost: 'text-gray-700 dark:text-gray-300' } } }"
+            @click="emit('showAssignClassModal', row.id)"
+          />
+        </template>
 
         <template #remove-student>
           <div class="group">

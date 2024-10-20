@@ -9,7 +9,7 @@
 export function formatFullName(firstName: string | null, lastName: string | null, email?: string | null): string {
   const fullName: string[] = []
   if ((!firstName || !firstName.length) && (!lastName || !lastName.length))
-    return (email && email.length) ? capitalizeFirstLetter(email.split('@')[0]) : 'Non renseigné'
+    return (email && email.length) ? capitalizeFirstLetter(email.split('@')[0] || '') : 'Non renseigné'
   if (firstName && firstName.length)
     fullName.push(firstName)
   if (lastName && lastName.length)
