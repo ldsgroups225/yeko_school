@@ -12,10 +12,10 @@ const router = useRouter()
     <div text-4xl>
       <div i-carbon-warning inline-block />
     </div>
-    <div>Not found</div>
+    <div>Page non trouvée</div>
     <div>
       <button class="btn m-3 mt-8 text-sm" @click="router.back()">
-        Back
+        Retour à la page précédente
       </button>
     </div>
   </main>

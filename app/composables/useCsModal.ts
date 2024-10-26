@@ -83,13 +83,9 @@ export function useCsModal<T extends MaybeStudent>() {
       return false
     }
 
-    if ('controlNoteAverage' in studentDTO
+    return !('controlNoteAverage' in studentDTO
       && studentDTO.controlNoteAverage !== undefined
-      && typeof studentDTO.controlNoteAverage !== 'number') {
-      return false
-    }
-
-    return true
+      && typeof studentDTO.controlNoteAverage !== 'number')
   }
 
   function openModal(student: T) {

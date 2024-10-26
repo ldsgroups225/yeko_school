@@ -108,7 +108,7 @@ function getActionItems(row: IStudentDTO) {
           <div class="group">
             <UButton color="red" variant="ghost" label="Danger" class="w-full" />
 
-            <div mode="hover" class="w-full hidden group-hover:flex">
+            <div class="w-full hidden group-hover:flex">
               <div class="flex p-4 flex-col rounded-md mt-1 gap-2 group-hover:bg-red-600/10">
                 <UButton color="red" variant="ghost" label="Retirer de la classe" class="w-full" @click="emit('removeFromClass', row.id)" />
                 <UButton color="red" variant="ghost" label="Retirer de l'école" class="w-full" @click="emit('removeFromSchool', row.id)" />

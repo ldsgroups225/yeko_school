@@ -64,7 +64,6 @@ type IUserProfileDTOExceptSchool = Omit<IUserProfileDTO, 'school'> & { schoolId:
  * @param {any} client - The Supabase client.
  * @param {string} userId - The ID of the user to fetch.
  * @returns {Promise<IUserProfileDTOExceptSchool>} The user profile.
- * @throws {H3Error} If the profile is not found or there's a database error.
  *
  * @example
  * try {
@@ -110,7 +109,6 @@ async function fetchUserProfile(client: any, userId: string): Promise<IUserProfi
  * @param {any} client - The Supabase client.
  * @param {string} schoolId - The ID of the school to fetch.
  * @returns {Promise<ISchoolDTO>} The school data.
- * @throws {H3Error} If the school is not found or there's a database error.
  *
  * @example
  * try {
@@ -140,7 +138,10 @@ async function fetchSchool(client: any, schoolId: string): Promise<ISchoolDTO> {
     name: school.name,
     code: school.code,
     cycleId: school.cycle_id,
-    imageUrl: school.image_url ?? '',
+    imageUrl: school.image_url,
+    email: school.email,
+    address: school.address,
+    phone: school.phone,
     createdAt: school.created_at ?? '',
     createdBy: school.created_by ?? '',
     updatedAt: school.updated_at ?? '',
@@ -176,7 +177,7 @@ function formatUserResponse(user: any, profile: IUserProfileDTOExceptSchool, sch
       role: profile.role,
       avatarUrl: profile.avatarUrl,
       school,
-    },
+    } satisfies IUserProfileDTO,
   }
 }
 
@@ -188,7 +189,6 @@ function formatUserResponse(user: any, profile: IUserProfileDTOExceptSchool, sch
  * @function
  * @param {H3Event} event - The H3 event object.
  * @returns {Promise<UserResponse>} The user data response.
- * @throws {H3Error} If the user is not authenticated or if there's an error fetching data.
  *
  * @example
  * // Assuming this is used in a Nuxt 3 API route
@@ -220,7 +220,7 @@ export default defineEventHandler(async (event) => {
     const school = await fetchSchool(client, profile.schoolId)
 
     if (withRedirect && (withRedirect as string).length > 0)
-      sendRedirect(event, `${withRedirect}`)
+      await sendRedirect(event, `${withRedirect}`)
 
     return formatUserResponse(user, profile, school)
   }

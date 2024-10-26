@@ -3,7 +3,7 @@ import type { IStudentDTO } from '~~/types'
 import { STUDENT_COLUMNS } from '~/constants'
 
 const props = defineProps<{
-  itemsPerPage: number | number
+  itemsPerPage: number
   selectedRows: IStudentDTO[]
   searchTerm: string
   selectedClasses: string[]

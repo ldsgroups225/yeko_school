@@ -22,7 +22,6 @@ type ValidatedQueryParams = z.infer<typeof querySchema>
  * Throws an error with a specified message and status code
  * @param {string} message - The error message
  * @param {number} statusCode - The HTTP status code (default: 400)
- * @throws {H3Error} - An H3 error object
  */
 function throwI18nError(message: string, statusCode: number = 400): never {
   throw createError({
@@ -35,7 +34,6 @@ function throwI18nError(message: string, statusCode: number = 400): never {
  * Validates and parses the query parameters
  * @param {unknown} query - The raw query object
  * @returns {Promise<ValidatedQueryParams>} - The validated and parsed query parameters
- * @throws {H3Error} - If validation fails
  */
 async function validateAndParseQueryParams(query: unknown): Promise<ValidatedQueryParams> {
   const result = querySchema.safeParse(query)
@@ -80,7 +78,6 @@ function buildSupabaseQuery(client: ClientType, query: ValidatedQueryParams) {
  * Main event handler for fetching students
  * @param {H3Event} event - The H3 event object
  * @returns {Promise<{ success: boolean; data: IClassDTO[] }>} - The response object with fetched students
- * @throws {H3Error} - If an error occurs during the process
  */
 export default defineEventHandler(async (event) => {
   const client = await csServerSupabaseClient(event)

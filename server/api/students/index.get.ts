@@ -24,7 +24,6 @@ type ValidatedQueryParams = z.infer<typeof querySchema>
  *
  * @param {string} message - The error message to be displayed.
  * @param {number} [statusCode] - The HTTP status code for the error (default is 400).
- * @throws {H3Error} An H3 error object with the specified message and status code.
  */
 function throwI18nError(message: string, statusCode: number = 400): never {
   throw createError({
@@ -38,7 +37,6 @@ function throwI18nError(message: string, statusCode: number = 400): never {
  *
  * @param {unknown} query - The raw query object to be validated.
  * @returns {Promise<ValidatedQueryParams>} A promise that resolves to the validated and parsed query parameters.
- * @throws {H3Error} If the validation fails, an error is thrown with details about the validation failure.
  *
  * @example
  * const rawQuery = { name: "John", ageMin: "18" };
@@ -111,7 +109,6 @@ function buildSupabaseQuery(client: ClientType, query: ValidatedQueryParams) {
  * @returns {Promise<{ success: boolean; data: IStudentDTO[] }>} A promise that resolves to an object containing:
  *   - success: A boolean indicating whether the operation was successful.
  *   - data: An array of parsed student DTOs.
- * @throws {H3Error} If there's an error during the process of fetching or parsing the students data.
  *
  * @example
  * // Assuming this is used in a Nuxt 3 API route

@@ -17,7 +17,6 @@ import { updateStudentSchema } from '~~/utils/validators'
  * @function validateStudentId
  * @param {string | undefined} id - The student ID from the route parameter.
  * @returns {string} The validated student ID.
- * @throws {H3Error} If the ID is missing or invalid.
  */
 function validateStudentId(id: string | undefined): string {
   if (!id) {
@@ -50,7 +49,6 @@ function validateStudentId(id: string | undefined): string {
  * @function validateAndParseData
  * @param {unknown} data - The raw request body data to be validated.
  * @returns {Promise<IEditingStudentDTO>} A promise that resolves to the validated and parsed data.
- * @throws {H3Error} If the validation fails, an error is thrown with details about the validation failure.
  */
 async function validateAndParseData(data: any): Promise<IEditingStudentDTO> {
   if (data.avatarUrl === '')
@@ -76,7 +74,6 @@ async function validateAndParseData(data: any): Promise<IEditingStudentDTO> {
  * @param {ClientType} client - The Supabase client.
  * @param {string} id - The ID of the student to fetch.
  * @returns {Promise<IStudentDTO>} A promise that resolves to the student data.
- * @throws {H3Error} If there's an error fetching the student or if the student is not found.
  */
 async function fetchStudentById(client: ClientType, id: string): Promise<IStudentDTO> {
   const qs = client
@@ -145,7 +142,6 @@ async function fetchStudentById(client: ClientType, id: string): Promise<IStuden
  * @param {any} client - The Supabase client.
  * @param {string} id - The ID of the student to update.
  * @param {IEditingStudentDTO} data - The data to update for the student.
- * @throws {H3Error} If there's an error updating the student record.
  */
 async function updateStudent(client: ClientType, id: string, data: IEditingStudentDTO) {
   let newAvatarUrl = data.avatarUrl
@@ -198,7 +194,6 @@ async function updateStudent(client: ClientType, id: string, data: IEditingStude
  * @function
  * @param {H3Event} event - The H3 event object.
  * @returns {Promise<{ success: boolean, message?: string, data?: IStudentDTO }>} A promise that resolves to an object indicating the success of the operation and containing the student data if applicable.
- * @throws {H3Error} If there's an error during the process of fetching or updating the student.
  */
 export default defineEventHandler(async (event) => {
   const method = event.node.req.method

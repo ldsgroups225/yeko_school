@@ -26,7 +26,6 @@ interface ResponseType { success: boolean, message: any, data: ICreateClassDTO |
 /**
  * @constant
  * @name useClassStore
- * @type {Store<'class', ClassState>}
  * @description Defines and exports the class store.
  */
 export const useClassStore = defineStore('class', {

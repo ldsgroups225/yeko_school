@@ -13,7 +13,6 @@ import { csServerSupabaseClient } from '~~/server/utils'
  * @function
  * @param {H3Event} event - The H3 event object.
  * @returns {Promise<{ success: boolean, message: string | null }>} A promise that resolves to an object indicating the success of the operation.
- * @throws {H3Error} If there's an error during the logout process.
  *
  * @example
  * // Assuming this is used in a Nuxt 3 API route

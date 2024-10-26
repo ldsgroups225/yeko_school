@@ -32,7 +32,6 @@ interface LoginFormData {
 /**
  * @constant
  * @name useUserStore
- * @type {Store<'user', UserState>}
  * @description Defines and exports the user store.
  */
 export const useUserStore = defineStore('user', {
@@ -43,7 +42,7 @@ export const useUserStore = defineStore('user', {
    */
   state: (): UserState => ({
     userData: null,
-    isLoading: false,
+    isLoading: true,
     error: null,
   }),
 
@@ -111,7 +110,7 @@ export const useUserStore = defineStore('user', {
         })
 
         if (success) {
-          this.userData = data
+          this.userData = data as IUserProfileDTO
         }
         else {
           throw new Error('Failed to fetch user data')
@@ -144,6 +143,15 @@ export const useUserStore = defineStore('user', {
       // Implement logout logic here (e.g., call a logout API endpoint)
       // Then clear the user data
       this.clearUserData()
+    },
+
+    /**
+     * @function setUserData
+     * @description Sets the user data in the store.
+     * @param {Partial<IUserProfileDTO>} userData - The user data to set.
+     */
+    setUserData(userData: IUserProfileDTO) {
+      this.userData = { ...userData }
     },
   },
 })

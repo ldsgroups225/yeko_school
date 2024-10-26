@@ -24,7 +24,7 @@ export function useDataImport(schema: z.ZodObject<any, any, any, any>) {
 
   function validateAndSetData(data: any[]) {
     const newErrors: { row: number, field: string, title: string, description: string | null }[] = []
-    const validatedData = data.map((row, index) => {
+    parsedData.value = data.map((row, index) => {
       try {
         return schema.parse(row)
       }
@@ -42,7 +42,6 @@ export function useDataImport(schema: z.ZodObject<any, any, any, any>) {
         return row
       }
     })
-    parsedData.value = validatedData
     errors.value = newErrors.map(err => ({
       type: err.field,
       code: err.title,
@@ -188,7 +187,7 @@ export function useDataImport(schema: z.ZodObject<any, any, any, any>) {
       }))
       fileError.value = {
         title: 'Avertissement d\'analyse CSV',
-        description: `Des problèmes ont été détectés lors de l'analyse du fichier CSV : ${results.errors.map(error => `Ligne ${error.row ?? 0 + 1}: ${error.message}`).join(', ')}`,
+        description: `Des problèmes ont été détectés lors de l'analyse du fichier CSV : ${results.errors.map(error => `Ligne ${error.row ?? 1}: ${error.message}`).join(', ')}`,
       }
     }
 

@@ -146,30 +146,3 @@ export function convertCase(
   const converter = new CaseConverter(toCaseType, options)
   return converter.execute(data)
 }
-
-/**
- * Benchmarks the performance of the convertCase function.
- *
- * @param data - The object to convert.
- * @param toCaseType - The target case type for conversion.
- * @param options - Options for case conversion.
- * @param iterations - The number of iterations to run.
- * @returns The average and total execution time.
- */
-export function benchmark(
-  data: object,
-  toCaseType: CaseType,
-  options: ConvertCaseOptions = {},
-  iterations: number = 1000,
-): { averageTime: number, totalTime: number } {
-  const start = Date.now()
-  for (let i = 0; i < iterations; i++) {
-    convertCase(data, toCaseType, options)
-  }
-  const end = Date.now()
-  const totalTime = end - start
-  return {
-    averageTime: totalTime / iterations,
-    totalTime,
-  }
-}

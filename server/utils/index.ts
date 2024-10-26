@@ -3,13 +3,11 @@ import type { H3Event } from 'h3'
 import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
 
 export async function csServerSupabaseClient(event: H3Event) {
-  const supabase = await serverSupabaseClient<Database>(event)
-  return supabase
+  return await serverSupabaseClient<Database>(event)
 }
 
 export async function csServerSupabaseUser(event: H3Event) {
-  const user = await serverSupabaseUser(event)
-  return user
+  return await serverSupabaseUser(event)
 }
 
 // export client type without awaiting

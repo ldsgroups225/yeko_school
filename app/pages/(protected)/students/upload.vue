@@ -71,7 +71,7 @@ async function handleUserUpload(data: IStudentImportDTO[]) {
       color: 'emerald',
     })
 
-    router.replace('/students')
+    await router.replace('/students')
   }
   catch (err) {
     const error = err as Error & { details: string }

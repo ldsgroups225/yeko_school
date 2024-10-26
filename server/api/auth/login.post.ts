@@ -26,7 +26,6 @@ const loginSchema = z.object({
  * Throws an H3Error with a localized message based on the provided error code.
  *
  * @param {string} code - The error code to look up.
- * @throws {H3Error} An H3 error object with the appropriate status code and localized message.
  *
  * @example
  * try {
@@ -143,7 +142,6 @@ function throwI18nErrorBasedOnCode(code: string): never {
  *
  * @param {unknown} formData - The raw form data to be validated.
  * @returns {Promise<LoginFormData>} A promise that resolves to the validated and parsed login form data.
- * @throws {H3Error} If the validation fails, an error is thrown with details about the validation failure.
  *
  * @example
  * const rawFormData = { email: "user@example.com", password: "password123" };
@@ -178,7 +176,6 @@ async function validateAndParseFormData(formData: unknown): Promise<LoginFormDat
  * @returns {Promise<{ success: boolean; data: string | undefined }>} A promise that resolves to an object containing:
  *   - success: A boolean indicating whether the login was successful.
  *   - data: The user ID if login was successful, undefined otherwise.
- * @throws {H3Error} If there's an error during the login process, including validation errors or authentication failures.
  *
  * @example
  * // Assuming this is used in a Nuxt 3 API route

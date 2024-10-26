@@ -37,7 +37,6 @@ interface LinkStudentParentData {
 /**
  * @constant
  * @name useStudentStore
- * @type {Store<'student', StudentState>}
  * @description Defines and exports the student store.
  */
 export const useStudentStore = defineStore('student', {

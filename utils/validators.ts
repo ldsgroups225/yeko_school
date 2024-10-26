@@ -35,7 +35,7 @@ export type IUpdateClassDTO = z.infer<typeof updateClassSchema>
 
 function refineStringAndNullify(schema: z.ZodString) {
   return schema
-    .refine(val => val.trim().length > 0 || val === null, {
+    .refine(val => val.trim().length > 0 || false, {
       message: 'La chaîne ne peut pas être vide.',
     })
     .transform(val => (val?.trim().length === 0 ? null : val))

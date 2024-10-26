@@ -34,7 +34,6 @@ type LinkStudentParentData = z.infer<typeof linkStudentParentSchema>
  * @function validateAndParseData
  * @param {unknown} data - The raw request body data to be validated.
  * @returns {Promise<LinkStudentParentData>} A promise that resolves to the validated and parsed data.
- * @throws {H3Error} If the validation fails, an error is thrown with details about the validation failure.
  *
  * @example
  * try {
@@ -66,7 +65,6 @@ async function validateAndParseData(data: unknown): Promise<LinkStudentParentDat
  * @param {any} client - The Supabase client.
  * @param {string} otp - The OTP to check.
  * @returns {Promise<string>} A promise that resolves to the parent ID associated with the OTP.
- * @throws {H3Error} If the OTP is invalid, expired, or already used.
  *
  * @example
  * try {
@@ -115,7 +113,6 @@ async function checkOTP(client: ClientType, otp: string): Promise<string> {
  * @param {any} client - The Supabase client.
  * @param {string} studentId - The ID of the student to update.
  * @param {string} parentId - The ID of the parent to link to the student.
- * @throws {H3Error} If there's an error updating the student record.
  *
  * @example
  * try {
@@ -146,7 +143,6 @@ async function updateStudentParent(client: ClientType, studentId: string, parent
  * @function markOTPAsUsed
  * @param {any} client - The Supabase client.
  * @param {string} otp - The OTP to mark as used.
- * @throws {H3Error} If there's an error updating the OTP status.
  *
  * @example
  * try {
@@ -178,7 +174,6 @@ async function markOTPAsUsed(client: ClientType, otp: string): Promise<void> {
  * @function
  * @param {H3Event} event - The H3 event object.
  * @returns {Promise<{ success: boolean, message: string }>} A promise that resolves to an object indicating the success of the operation.
- * @throws {H3Error} If there's an error during the process of linking the student and parent.
  *
  * @example
  * // Assuming this is used in a Nuxt 3 API route

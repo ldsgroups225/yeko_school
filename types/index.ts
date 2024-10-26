@@ -25,8 +25,8 @@ export enum ERole {
 export function roleToString(role: ERole): string {
   const roleMap: { [key in ERole]: string } = {
     [ERole.PARENT]: 'Parent',
-    [ERole.TEACHER]: 'Teacher',
-    [ERole.DIRECTOR]: 'Director',
+    [ERole.TEACHER]: 'Enseignant',
+    [ERole.DIRECTOR]: 'Directeur',
   }
 
   const result = roleMap[role]
@@ -60,16 +60,58 @@ export function stringToRole(roleString: string): ERole | undefined {
   return stringRoleMap[roleString]
 }
 
+/**
+ * Base roles definition using const assertion
+ * The 'as const' makes the object immutable and its properties read-only
+ */
+export const ERoleAttributes = {
+  TEACHER: 2,
+  DIRECTOR: 3,
+  FOUNDER: 4,
+} as const
+
+// Create type from const assertion
+// This creates a union type of all possible values
+export type TRoleAttributes = typeof ERoleAttributes[keyof typeof ERoleAttributes]
+
+export const roleOptions: { label: string, value: TRoleAttributes }[] = [
+  { label: 'Enseignant', value: ERoleAttributes.TEACHER },
+  { label: 'Directeur', value: ERoleAttributes.DIRECTOR },
+  { label: 'Fondateur', value: ERoleAttributes.FOUNDER },
+]
+
+/**
+ * Utility class for role operations
+ */
+export class RoleManager {
+  /**
+   * Gets available role transitions for a given role
+   */
+  static getAvailableTransitions(currentRole: TRoleAttributes): TRoleAttributes[] {
+    const transitions: Record<TRoleAttributes, TRoleAttributes[]> = {
+      [ERoleAttributes.FOUNDER]: [ERoleAttributes.TEACHER, ERoleAttributes.DIRECTOR],
+      [ERoleAttributes.DIRECTOR]: [ERoleAttributes.TEACHER],
+      [ERoleAttributes.TEACHER]: [],
+    }
+
+    return transitions[currentRole] || []
+  }
+}
+
 export interface ISchoolDTO {
-  id: string
+  id?: string
   name: string
   code: string
+  phone: string
+  email: string
   cycleId: string
-  imageUrl: string
-  createdAt: string
-  createdBy: string
-  updatedAt: string
-  updatedBy: string
+  imageUrl?: File | string | null
+  address?: string
+  isTechnicalEducation?: boolean
+  createdAt?: string
+  createdBy?: string
+  updatedAt?: string
+  updatedBy?: string
 }
 
 export interface IParentDTO {

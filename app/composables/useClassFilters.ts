@@ -9,7 +9,6 @@ export function useClassFilters<T extends { [key: string]: any }>(data: Ref<T[]>
         hasNotMainTeacherFilter.value
           ? item.mainTeacherId === null
           : true
-            || item.name.toLowerCase().includes(searchTerm.value.toLowerCase())
       ),
     )
   })

@@ -21,8 +21,7 @@ useHead({
 
 <style>
 html,
-body,
-#__nuxt {
+body {
   height: 100vh;
   margin: 0;
   padding: 0;

@@ -1,6 +1,5 @@
-import { DATE_FORMAT_SHORT, TIME_FORMAT_24H } from '~~/config/constants'
+import { DATE_FORMAT_SHORT } from '~~/config/constants'
 import {
-  differenceInMinutes,
   differenceInYears,
   format,
   isValid,
@@ -37,26 +36,12 @@ function formatDateWithOptions(date: DateInput, formatString: string, options?: 
  * Formats a Date object or a date string to a localized date string.
  *
  * @param {DateInput} date - The Date object or date string to format.
+ * @param format
+ * @param locale
  * @returns {string} The formatted date string.
  */
 export function formatDate(date: DateInput, format: string = DATE_FORMAT_SHORT, locale: 'fr' | 'en' = 'fr'): string {
   return formatDateWithOptions(date, format, { locale: locale === 'fr' ? fr : enUS })
-}
-
-/**
- * Formats a Date object or a date string to a time string.
- *
- * @param {DateInput} date - The Date object or date string to format.
- * @returns {string} The formatted time string.
- */
-export function formatTime(date: DateInput): string {
-  if (typeof date === 'string') {
-    if (date.length === 5)
-      return date
-    if (date.length === 8)
-      return date.substring(0, 5)
-  }
-  return formatDateWithOptions(date, TIME_FORMAT_24H)
 }
 
 /**
@@ -72,16 +57,6 @@ export function parseStringToDate(dateString: string, formatString: string): Dat
 }
 
 /**
- * Parses a date string to a Date object.
- *
- * @param {string} dateString - The date string to parse.
- * @returns {Date | null} The parsed Date object, or null if the parsing fails.
- */
-export function parseDate(dateString: string, format: string = DATE_FORMAT_SHORT): Date | null {
-  return parseStringToDate(dateString, format)
-}
-
-/**
  * Parse date string in French format (DD/MM/YYYY) to Date object.
  *
  * @param {string} dateString - The date string to parse (e.g., "01/01/1970").
@@ -89,45 +64,6 @@ export function parseDate(dateString: string, format: string = DATE_FORMAT_SHORT
  */
 export function parseFrenchDate(dateString: string): Date | null {
   return parseStringToDate(dateString, 'dd/MM/yyyy')
-}
-
-/**
- * Parses a time string to a Date object.
- *
- * @param {string} timeString - The time string to parse.
- * @returns {Date | null} The parsed Date object, or null if the parsing fails.
- */
-export function parseTime(timeString: string): Date | null {
-  return parseStringToDate(timeString, TIME_FORMAT_24H)
-}
-
-/**
- * Calculates the duration in minutes between a start time and an arrival time.
- *
- * @param {Date} startTime - The start time.
- * @param {Date} arrivalTime - The arrival time.
- * @returns {number} The duration in minutes, or 0 if the arrival time is before the start time.
- */
-export function calculateLateDuration(startTime: Date, arrivalTime: Date): number {
-  return Math.max(0, differenceInMinutes(arrivalTime, startTime))
-}
-
-/**
- * Gets the current day of the week as a number (0-6, where 0 is Sunday).
- *
- * @returns {number} The current day of the week.
- */
-export function getCurrentDayOfWeek(): number {
-  return new Date().getDay()
-}
-
-/**
- * Gets the current time as a string in HH:mm format.
- *
- * @returns {string} The current time in HH:mm format.
- */
-export function getCurrentTimeString(): string {
-  return formatTimeString(new Date())
 }
 
 /**
@@ -160,45 +96,6 @@ export function parseTimeString(timeString: string): Date {
   const date = new Date()
   date.setHours(hours, minutes, 0, 0)
   return date
-}
-
-/**
- * Compares two time strings in HH:mm format.
- *
- * @param {string} time1 - The first time string.
- * @param {string} time2 - The second time string.
- * @returns {number} A negative number if time1 is before time2, 0 if they are equal, and a positive number if time1 is after time2.
- */
-export function compareTimeStrings(time1: string, time2: string): number {
-  const date1 = parseTimeString(time1)
-  const date2 = parseTimeString(time2)
-  return date1.getTime() - date2.getTime()
-}
-
-/**
- * Extracts the hour and minute (HH:mm) from an ISO 8601 date string.
- *
- * @param {string} dateString - The ISO 8601 date string to extract the time from.
- * @returns {string} The extracted hour and minute in the format "HH:mm".
- */
-export function extractHourAndMinute(dateString: string): string {
-  if (dateString.length === 8)
-    return dateString.substring(0, 5)
-  const date = parseISO(dateString)
-  return formatTimeString(date)
-}
-
-/**
- * Converts a time string in the format "HH:MM" to an ISO 8601 timestamp.
- *
- * The date portion of the timestamp will be the current date.
- *
- * @param {string} timeString - The time string to convert, in the format "HH:MM".
- * @returns {string} The ISO 8601 timestamp representing the current date and the given time.
- */
-export function convertToIsoTime(timeString: string): string {
-  const date = parseTimeString(timeString)
-  return date.toISOString()
 }
 
 /**
