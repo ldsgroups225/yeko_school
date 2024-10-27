@@ -1,3 +1,5 @@
+import { parseTime } from '~~/utils/dateTime'
+import { dayOfWeekMap } from '~~/utils/mapDaysOfTheWeek'
 import { z } from 'zod'
 
 export const updateStudentSchema = z.object({
@@ -118,4 +120,22 @@ export const studentImportDTOSchema = z.object({
   avatarUrl: z.string().nullish(),
 })
 
+export const scheduleImportDTOSchema = z.object({
+  className: z.string().min(2, { message: 'Le nom de la classe doit contenir au moins 2 caractères.' }).transform(val => val.trim()),
+  dayOfWeek: z
+    .string()
+    .transform(val => dayOfWeekMap[val])
+    .refine(val => val !== undefined, { message: 'Le jour de la semaine est invalide.' }),
+  startTime: z
+    .string()
+    .refine(val => parseTime(val) !== null, { message: 'L\'heure de début est invalide.' }),
+  endTime: z
+    .string()
+    .refine(val => parseTime(val) !== null, { message: 'L\'heure de fin est invalide.' }),
+  subjectName: z.string().min(2, { message: 'Le nom de la matière doit contenir au moins 2 caractères.' }).transform(val => val.trim()),
+  teacherEmail: z.string().email({ message: 'Adresse e-mail invalide.' }).transform(val => val.trim().toLowerCase()),
+  room: refineStringAndNullify(z.string()).nullish(),
+})
+
 export type IStudentImportDTO = z.infer<typeof studentImportDTOSchema>
+export type IScheduleImportDTO = z.infer<typeof scheduleImportDTOSchema>

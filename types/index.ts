@@ -249,3 +249,24 @@ export enum ECycle {
   PRIMARY = 'primary',
   SECONDARY = 'secondary',
 }
+
+/**
+ * Represents a schedule entry in the calendar
+ * @interface IScheduleCalendarDTO
+ */
+export interface IScheduleCalendarDTO {
+  /** Unique identifier for the schedule */
+  id: string
+  /** CSS class name for styling */
+  className: string
+  /** Name of the subject */
+  subjectName: string
+  /** Name of the teacher */
+  teacherName: string
+  /** Day of the week (1-5, Monday-Friday) */
+  dayOfWeek: number
+  /** Start time in HH:mm format */
+  startTime: string
+  /** End time in HH:mm format */
+  endTime: string
+}

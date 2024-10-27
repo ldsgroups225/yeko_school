@@ -18,6 +18,7 @@ const {
   isDragActive,
   columns,
   errorRows,
+  clearErrors,
 } = useDataImport(props.schema)
 
 const { exportToCsv } = useDataExport()
@@ -43,7 +44,7 @@ async function handleUpload() {
 
   isUploading.value = true
   try {
-    // await props.onUpload(parsedData.value)
+    await props.onUpload(parsedData.value)
     // validationMessage.value = {
     //   type: 'success',
     //   title: 'Sauvegarde réussie',
@@ -52,6 +53,7 @@ async function handleUpload() {
     // // Clear the data after successful upload
     parsedData.value = []
     errors.value = []
+    clearErrors()
   }
   catch (error) {
     validationMessage.value = {

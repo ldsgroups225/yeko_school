@@ -240,6 +240,13 @@ export function useDataImport(schema: z.ZodObject<any, any, any, any>) {
     })
   }
 
+  function clearErrors() {
+    errors.value = []
+    fileError.value = null
+    validationMessage.value = null
+    parsedData.value = []
+  }
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: (acceptedFiles) => {
       if (acceptedFiles && acceptedFiles.length > 0) {
@@ -281,5 +288,6 @@ export function useDataImport(schema: z.ZodObject<any, any, any, any>) {
     isDragActive,
     columns,
     errorRows,
+    clearErrors,
   }
 }

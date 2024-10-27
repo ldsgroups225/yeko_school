@@ -27,13 +27,13 @@ const defaultConverters: Record<CaseType, (str: string) => string> = {
       .replace(/([A-Z])/g, '_$1')
       .toLowerCase()
       .replace(/^_/, '')
-      .replace(/[-.]/, '_'),
+      .replace(/[-.]/g, '_'),
   kebabCase: str =>
     str
       .replace(/([A-Z])/g, '-$1')
       .toLowerCase()
       .replace(/^-/, '')
-      .replace(/[_.]/, '-'),
+      .replace(/[_.]/g, '-'),
   pascalCase: str =>
     str
       .split(/[-_.]/)
@@ -44,18 +44,31 @@ const defaultConverters: Record<CaseType, (str: string) => string> = {
       .replace(/([A-Z])/g, '_$1')
       .toUpperCase()
       .replace(/^_/, '')
-      .replace(/[-.]/, '_'),
+      .replace(/[-.]/g, '_'),
   dotCase: str =>
     str
       .replace(/([A-Z])/g, '.$1')
       .toLowerCase()
       .replace(/^\./, '')
-      .replace(/[-_]/, '.'),
+      .replace(/[-_]/g, '.'),
 }
 
 function isObject(val: unknown): val is Record<string, unknown> {
   return typeof val === 'object' && val !== null && !Array.isArray(val)
 }
+
+/**
+ * Converts keys of the object `T` to the specified case type.
+ */
+export type ConvertCase<T> = T extends Record<string, any>
+  ? { [K in keyof T as ConvertKey<K & string>]: ConvertCase<T[K]> }
+  : T
+
+// Helper type to convert individual keys
+
+type ConvertKey<Key extends string> =
+// Add specific case conversions here as needed
+    Key // Here you would add more logic to handle case conversion if necessary
 
 /**
  * Class for performing case conversion on objects.
@@ -71,7 +84,7 @@ class CaseConverter {
    */
   constructor(
     private toCaseType: CaseType,
-    options: ConvertCaseOptions = {},
+      options: ConvertCaseOptions = {},
   ) {
     this.options = {
       preserveConsecutiveUppercase: false,
@@ -121,12 +134,12 @@ class CaseConverter {
    * @returns The converted object.
    * @throws {Error} If the input is not an object.
    */
-  public execute(data: object): Record<string, unknown> {
+  public execute<T extends Record<string, unknown>>(data: T): ConvertCase<T> {
     if (!isObject(data)) {
       throw new Error('Input must be an object')
     }
 
-    return this.convertObject(data)
+    return this.convertObject(data) as ConvertCase<T>
   }
 }
 
@@ -136,13 +149,13 @@ class CaseConverter {
  * @param data - The object to convert.
  * @param toCaseType - The target case type for conversion.
  * @param options - Options for case conversion.
- * @returns The converted object.
+ * @returns The converted object with typed keys.
  */
-export function convertCase(
-  data: object,
+export function convertCase<T>(
+  data: T,
   toCaseType: CaseType,
   options: ConvertCaseOptions = {},
-): Record<string, unknown> {
+): ConvertCase<T> {
   const converter = new CaseConverter(toCaseType, options)
-  return converter.execute(data)
+  return converter.execute(data as any) as ConvertCase<T>
 }

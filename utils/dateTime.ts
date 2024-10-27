@@ -1,4 +1,4 @@
-import { DATE_FORMAT_SHORT } from '~~/config/constants'
+import { DATE_FORMAT_SHORT, TIME_FORMAT_24H } from '~~/config/constants'
 import {
   differenceInYears,
   format,
@@ -113,4 +113,66 @@ export function getAge(birthday: string): number {
   }
 
   return differenceInYears(today, birthDate)
+}
+
+/**
+ * Parses a time string to a Date object.
+ *
+ * @param {string} timeString - The time string to parse.
+ * @returns {Date | null} The parsed Date object, or null if the parsing fails.
+ */
+export function parseTime(timeString: string): Date | null {
+  return parseStringToDate(timeString, TIME_FORMAT_24H)
+}
+
+/**
+ * Date utility functions for schedule calendar
+ */
+
+/**
+ * Gets array of dates for the current week
+ * @param currentDate - Current date to calculate week from
+ * @param weekStart - Starting day of week (1 = Monday)
+ */
+export function getWeekDays(currentDate: Date, weekStart: number = 1): Date[] {
+  const days: Date[] = []
+  const startOfWeek = new Date(currentDate)
+  const dayOfWeek = startOfWeek.getDay() || 7
+  startOfWeek.setDate(startOfWeek.getDate() - (dayOfWeek - weekStart))
+
+  for (let i = 0; i < 5; i++) {
+    const day = new Date(startOfWeek)
+    day.setDate(startOfWeek.getDate() + i)
+    days.push(day)
+  }
+
+  return days
+}
+
+/**
+ * Checks if a date is today
+ * @param date - Date to check
+ */
+export function isToday(date: Date): boolean {
+  const today = new Date()
+  return date.toDateString() === today.toDateString()
+}
+
+/**
+ * Formats a date range for display
+ * @param startTime - Start time string
+ * @param endTime - End time string
+ */
+export function formatTimeRange(startTime: string, endTime: string): string {
+  return `${startTime} - ${endTime}`
+}
+
+/**
+ * Gets the week number for a given date
+ * @param date - Date to get week number for
+ */
+export function getWeekNumber(date: Date): number {
+  const firstDayOfYear = new Date(date.getFullYear(), 0, 1)
+  const pastDaysOfYear = (date.getTime() - firstDayOfYear.getTime()) / 86400000
+  return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7)
 }
