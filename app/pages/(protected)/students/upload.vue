@@ -11,19 +11,19 @@ const toast = useToast()
 const router = useRouter()
 const { userData } = useUserStore()
 
-// Supebase client
+// Supabase client
 const supabase = useSupabaseClient<Database>()
 
 const isSubmitting = ref(false)
 
 const { data: classes, error, status, execute } = await useAsyncData('classes', async () => {
-  if (!userData || !userData?.school) {
+  if (!userData || !userData?.school || !userData?.school.id) {
     throw new Error('Unauthorized')
   }
   const { data, error: err } = await supabase
     .from('classes')
     .select('id, name')
-    .eq('school_id', userData?.school?.id)
+    .eq('school_id', userData.school.id)
     .order('grade_id')
 
   if (err)

@@ -41,17 +41,6 @@ const { data: teachers, execute: executeTeachers } = await useAsyncData('teacher
   return data
 })
 
-// Function to convert day of week from text to integer
-const dayOfWeekMap: { [key: string]: number } = {
-  Monday: 1,
-  Tuesday: 2,
-  Wednesday: 3,
-  Thursday: 4,
-  Friday: 5,
-  Saturday: 6,
-  Sunday: 7,
-}
-
 // Function to handle the upload of schedule data
 async function handleScheduleUpload(data: IScheduleImportDTO[]) {
   try {

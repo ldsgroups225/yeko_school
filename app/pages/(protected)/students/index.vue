@@ -86,14 +86,14 @@ async function handleAssignClass() {
   const studentId = selectedStudentForAssignClass.value
   const classId = toRaw(selectedClassToAssign.value).id
 
-  if (!userData || !userData?.school) {
+  if (!userData || !userData?.school || !userData?.school.id) {
     throw new Error('Unauthorized')
   }
 
   const { error: classAssignmentError } = await supabase
     .from('students')
     .update({ class_id: classId })
-    .eq('school_id', userData?.school?.id)
+    .eq('school_id', userData.school.id)
     .eq('id', studentId)
 
   if (classAssignmentError) {
