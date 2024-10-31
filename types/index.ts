@@ -172,7 +172,7 @@ export interface IStudentDTO {
   parentId: string | null
   schoolId: string | null
   classId: string | null
-  className?: string | null
+  classroomName?: string | null
   idNumber: string
   firstName: string
   lastName: string
@@ -255,18 +255,15 @@ export enum ECycle {
  * @interface IScheduleCalendarDTO
  */
 export interface IScheduleCalendarDTO {
-  /** Unique identifier for the schedule */
   id: string
-  /** CSS class name for styling */
-  className: string
-  /** Name of the subject */
-  subjectName: string
-  /** Name of the teacher */
-  teacherName: string
-  /** Day of the week (1-5, Monday-Friday) */
+  classId: string
+  classroomName?: string
+  subjectId: string
+  subjectName?: string
+  teacherId: string
+  teacherName?: string
   dayOfWeek: number
-  /** Start time in HH:mm format */
   startTime: string
-  /** End time in HH:mm format */
   endTime: string
+  room?: string
 }

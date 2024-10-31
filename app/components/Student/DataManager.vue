@@ -18,7 +18,7 @@ function handleExport() {
       idNumber: student.idNumber,
       address: student.address,
       avatarUrl: student.avatarUrl,
-      className: student.className,
+      classroomName: student.classroomName,
       dateOfBirth: student.dateOfBirth ? formatDate(student.dateOfBirth) : null,
     } satisfies IStudentImportDTO
   })

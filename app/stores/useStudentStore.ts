@@ -272,7 +272,7 @@ export const useStudentStore = defineStore('student', {
 
         // If the linking was successful, we might want to refresh the student data
         for (const std of students) {
-          this.updateLocalStudentList({ id: std.id, classId: null, className: null })
+          this.updateLocalStudentList({ id: std.id, classId: null, classroomName: null })
         }
 
         return true
@@ -302,7 +302,7 @@ export const useStudentStore = defineStore('student', {
 
         // If the linking was successful, we might want to refresh the student data
         for (const std of students) {
-          this.updateLocalStudentList({ id: std.id, schoolId: null, classId: null, className: null })
+          this.updateLocalStudentList({ id: std.id, schoolId: null, classId: null, classroomName: null })
         }
 
         return true

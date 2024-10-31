@@ -47,7 +47,7 @@ async function handleUserUpload(data: IStudentImportDTO[]) {
       const processedStudent: InsertStudent = {
         school_id: schoolId,
         parent_id: null,
-        class_id: student.className ? classMap.get(student.className.toLowerCase()) || null : null,
+        class_id: student.classroomName ? classMap.get(student.classroomName.toLowerCase()) || null : null,
         id_number: student.idNumber,
         first_name: student.firstName,
         last_name: student.lastName,

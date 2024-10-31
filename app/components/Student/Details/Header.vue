@@ -25,8 +25,8 @@ const emit = defineEmits<{
         <USkeleton v-if="isLoading" class="h-5 w-48" />
         <p v-else-if="student" class="text-lg text-gray-600 dark:text-gray-300">
           Matricule: {{ student.idNumber }}
-          <UBadge v-if="student.className" color="primary" class="ml-2">
-            {{ student.className }}
+          <UBadge v-if="student.classroomName" color="primary" class="ml-2">
+            {{ student.classroomName }}
           </UBadge>
         </p>
       </div>

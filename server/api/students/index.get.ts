@@ -144,7 +144,7 @@ export default defineEventHandler(async (event) => {
       parentId: student.parent_id,
       schoolId: student.school_id,
       classId: student.class_id,
-      className: student.class?.name || null,
+      classroomName: student.class?.name || null,
       idNumber: student.id_number,
       firstName: student.first_name,
       lastName: student.last_name,

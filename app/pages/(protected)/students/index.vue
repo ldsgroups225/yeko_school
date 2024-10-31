@@ -108,7 +108,7 @@ async function handleAssignClass() {
     return
   }
 
-  updateLocalStudentList({ id: studentId, classId, className: selectedClassToAssign.value.label })
+  updateLocalStudentList({ id: studentId, classId, classroomName: selectedClassToAssign.value.label })
   toast.add({
     title: 'Succès',
     description: 'L\'élève a bien été assigné à la classe sélectionnée.',

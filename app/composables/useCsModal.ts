@@ -63,7 +63,7 @@ export function useCsModal<T extends MaybeStudent>() {
     const optionalStringProps: (keyof IStudentDTO)[] = [
       'schoolId',
       'classId',
-      'className',
+      'classroomName',
       'dateOfBirth',
       'address',
       'avatarUrl',
