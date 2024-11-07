@@ -139,3 +139,29 @@ export const scheduleImportDTOSchema = z.object({
 
 export type IStudentImportDTO = z.infer<typeof studentImportDTOSchema>
 export type IScheduleImportDTO = z.infer<typeof scheduleImportDTOSchema>
+
+export const teacherFormSchema = z.object({
+  firstName: z.string({
+    required_error: 'Le prénom est obligatoire.',
+  }).min(2, 'Le prenom doit contenir au moins 2 caractères.'),
+  lastName: z.string({
+    required_error: 'Le nom de famille est obligatoire.',
+  }).min(2, 'Le nom de famille doit contenir au moins 2 caractères.'),
+  phone: z.string({
+    required_error: 'Le numéro de téléphone est obligatoire.',
+  }).min(10, 'Le numéro de téléphone doit contenir au moins 10 caractères.'),
+  email: z.string({
+    required_error: 'L\'adresse email est obligatoire.',
+  }).email('L\'adresse email n\'est pas valide.'),
+  password: z.string({
+    required_error: 'Le mot de passe est obligatoire.',
+  }).min(8, 'Le mot de passe doit contenir au moins 8 caractères.'),
+  confirmPassword: z.string({
+    required_error: 'Confirmez votre mot de passe.',
+  }).min(8, 'Le mot de passe doit contenir au moins 8 caractères.'),
+}).refine(data => data.password === data.confirmPassword, {
+  message: 'Les mots de passe ne correspondent pas.',
+  path: ['confirmPassword'],
+})
+
+export type ITeacherForm = z.infer<typeof teacherFormSchema>

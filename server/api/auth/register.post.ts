@@ -1,33 +1,12 @@
 import { csServerSupabaseClient } from '~~/server/utils'
 import { throwI18nErrorBasedOnCode } from '~~/utils/throwI18nErrorBasedOnCode'
-import { z } from 'zod'
-
-/**
- * Represents the structure of the login form data.
- */
-interface LoginFormData {
-  /** The user's email address. */
-  email: string
-  /** The user's password. */
-  password: string
-  /** Optional flag to remember the user's session. */
-  rememberMe?: boolean
-}
-
-/**
- * Zod schema for validating login form data.
- */
-const loginSchema = z.object({
-  email: z.string().email({ message: 'L\'email est invalide' }),
-  password: z.string().min(6, { message: 'Le mot de passe doit contenir au moins 6 caractères' }),
-  rememberMe: z.boolean().optional(),
-})
+import { type ITeacherForm, teacherFormSchema } from '~~/utils/validators'
 
 /**
  * Validates and parses the login form data using the Zod schema.
  *
  * @param {unknown} formData - The raw form data to be validated.
- * @returns {Promise<LoginFormData>} A promise that resolves to the validated and parsed login form data.
+ * @returns {Promise<ITeacherForm>} A promise that resolves to the validated and parsed login form data.
  *
  * @example
  * const rawFormData = { email: "user@example.com", password: "password123" };
@@ -38,8 +17,8 @@ const loginSchema = z.object({
  *   console.error(error.statusCode, error.message);
  * }
  */
-async function validateAndParseFormData(formData: unknown): Promise<LoginFormData> {
-  const result = loginSchema.safeParse(formData)
+async function validateAndParseFormData(formData: unknown): Promise<ITeacherForm> {
+  const result = teacherFormSchema.safeParse(formData)
 
   if (!result.success) {
     const errorMessages = result.error.errors.map(err => err.message).join(', ')
@@ -78,13 +57,23 @@ async function validateAndParseFormData(formData: unknown): Promise<LoginFormDat
 export default defineEventHandler(async (event) => {
   try {
     const formData = await readBody(event)
-    const { email, password } = await validateAndParseFormData(formData)
+    const { email, password, phone, firstName, lastName } = await validateAndParseFormData(formData)
 
     const client = await csServerSupabaseClient(event)
-    const { error } = await client.auth.signInWithPassword({ email, password })
+    const { error } = await client.auth.signUp({
+      email,
+      password,
+      phone,
+      options: {
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+        },
+      },
+    })
 
     if (error) {
-      console.error('[E_SIGN_IN]', error.code)
+      console.error('[E_SIGN_UP]', error.code)
       throwI18nErrorBasedOnCode(event, error.code ?? 'unexpected_failure')
     }
 

@@ -7,8 +7,10 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+const router = useRouter()
 const userStore = useUserStore()
-const { isAuthenticated } = storeToRefs(userStore)
+const { login } = userStore
+const { isAuthenticated, error: loginError } = storeToRefs(userStore)
 
 const fields = [
   {
@@ -62,25 +64,20 @@ function validate(state: { email: string | undefined, password: string | undefin
 }
 
 async function onSubmit(data: any) {
-  try {
-    await userStore.login({
-      email: data.email,
-      password: data.password,
-      rememberMe: data.remember,
-    })
+  await login({
+    email: data.email,
+    password: data.password,
+    rememberMe: data.remember,
+  })
 
-    if (isAuthenticated?.value) {
-      // Redirect to dashboard or home page
-      navigateTo('/dashboard')
+  if (isAuthenticated?.value) {
+    // Redirect to dashboard or home page
+    router.replace('/dashboard')
 
-      // clears the form
-      data.email = ''
-      data.password = ''
-      data.remember = false
-    }
-  }
-  catch (error) {
-    console.error('Login error:', error)
+    // clears the form
+    data.email = ''
+    data.password = ''
+    data.remember = false
   }
 }
 </script>
@@ -111,8 +108,8 @@ async function onSubmit(data: any) {
           </NuxtLink>
         </template>
         <template #validation>
-          <UAlert v-if="userStore.error" :title="userStore.error" color="red" icon="i-heroicons-information-circle-20-solid">
-            {{ userStore.error }}
+          <UAlert v-if="loginError" :title="loginError" color="red" icon="i-heroicons-information-circle-20-solid">
+            {{ loginError }}
           </UAlert>
         </template>
         <template #footer>

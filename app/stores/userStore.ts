@@ -4,6 +4,7 @@
  */
 
 import type { IUserProfileDTO } from '~~/types'
+import type { ITeacherForm } from '~~/utils/validators'
 import { defineStore } from 'pinia'
 
 /**
@@ -60,12 +61,42 @@ export const useUserStore = defineStore('user', {
   actions: {
     /**
      * @async
+     * @function register
+     * @description Attempts to createNewAccount the user with the provided credentials.
+     * @param {ITeacherForm} credentials - The user's registration credentials.
+     * @throws {Error} If registration fails or an error occurs during the process.
+     */
+    async register(credentials: ITeacherForm): Promise<boolean> {
+      this.isLoading = true
+      this.error = null
+      try {
+        const { success, message } = await $fetch<{ success: boolean, message: any }>('/api/auth/register', {
+          method: 'POST',
+          body: credentials,
+        })
+        if (!success)
+          throw new Error(message)
+
+        return true
+      }
+      catch (error) {
+        const _error: { message: string } = error as { message: string }
+        this.error = _error.message
+        return false
+      }
+      finally {
+        this.isLoading = false
+      }
+    },
+
+    /**
+     * @async
      * @function login
      * @description Attempts to log in the user with the provided credentials.
      * @param {LoginFormData} credentials - The user's login credentials.
      * @throws {Error} If login fails or an error occurs during the process.
      */
-    async login(credentials: LoginFormData) {
+    async login(credentials: LoginFormData): Promise<boolean> {
       this.isLoading = true
       this.error = null
       try {
@@ -79,6 +110,7 @@ export const useUserStore = defineStore('user', {
         if (success) {
           // If login is successful, fetch user data
           await this.fetchUserData()
+          return true
         }
         else {
           throw new Error('Login failed')
@@ -87,6 +119,7 @@ export const useUserStore = defineStore('user', {
       catch (error) {
         const _error: { message: string } = error as { message: string }
         this.error = _error.message
+        return false
       }
       finally {
         this.isLoading = false

@@ -1,18 +1,23 @@
 <script lang="ts" setup>
 import SettingsProfileForm from '~/components/Settings/ProfileForm.vue'
 import Staff from '~/components/Settings/Staff.vue'
+import TeacherForm from '~/components/Settings/TeacherForm.vue'
 
 const activeTab = ref(0)
 
 // Define tabs configuration
 const tabs = [
   {
-    label: 'School Profile',
+    label: 'Ecole',
     component: SettingsProfileForm,
   },
   {
-    label: 'Staff',
+    label: 'Membres',
     component: Staff,
+  },
+  {
+    label: 'Créer un compte professeur',
+    component: TeacherForm,
   },
 ]
 </script>
