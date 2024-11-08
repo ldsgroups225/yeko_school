@@ -5,14 +5,13 @@ export const YEAR_OPTIONS = [
 ]
 
 export const STUDENT_COLUMNS = [
-  { key: 'index', label: 'N°', sortable: true },
   { key: 'lastName', label: 'Nom', sortable: true },
   { key: 'firstName', label: 'Prénom', sortable: true },
   { key: 'idNumber', label: 'Matricule', sortable: true },
   { key: 'gender', label: 'Sexe', sortable: true },
   { key: 'dateOfBirth', label: 'Date de naissance', sortable: true },
   { key: 'age', label: 'Age', sortable: true },
-  { key: 'className', label: 'Classe', sortable: true },
+  { key: 'classroomName', label: 'Classe', sortable: true },
   { key: 'actions', label: 'Actions', sortable: false },
 ]
 

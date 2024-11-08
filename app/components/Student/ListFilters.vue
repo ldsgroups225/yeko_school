@@ -28,7 +28,7 @@ function getDropdownItems(subclasses: { id: string, name: string }[]) {
     <UInput
       v-model="searchTerm"
       icon="i-heroicons-magnifying-glass-20-solid"
-      placeholder="Rechercher un étudiant..."
+      placeholder="Rechercher un élève..."
       @update:model-value="(value) => emit('update:searchTerm', value)"
     />
     <div class="flex flex-wrap gap-2">

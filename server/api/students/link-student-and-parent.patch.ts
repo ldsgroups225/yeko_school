@@ -131,7 +131,7 @@ async function updateStudentParent(client: ClientType, studentId: string, parent
   if (error) {
     throw createError({
       statusCode: 500,
-      message: 'Erreur lors de la mise à jour de l\'étudiant',
+      message: 'Erreur lors de la mise à jour de l\'élèves',
     })
   }
 }

@@ -21,6 +21,7 @@
     "@pinia/nuxt": "^0.5.5",
     "@tanstack/vue-table": "^8.20.5",
     "@vueuse/nuxt": "^11.2.0",
+    "change-case": "^5.4.4",
     "chart.js": "^4.4.6",
     "crypto-js": "^4.2.0",
     "date-fns": "^4.1.0",

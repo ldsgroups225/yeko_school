@@ -92,7 +92,7 @@ export default defineEventHandler(async (event) => {
 
   if (error) {
     console.error('[E_FETCH_STUDENTS]', error)
-    throwI18nError('Erreur lors de la récupération des étudiants', 500)
+    throwI18nError('Erreur lors de la récupération des élèves', 500)
   }
 
   const parsedClasses = classes.map((cls) => {

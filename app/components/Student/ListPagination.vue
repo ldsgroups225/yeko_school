@@ -1,10 +1,9 @@
 <script setup lang="ts">
 defineProps<{
-  pageFrom: number
-  pageTo: number
   total: number
-  pageCount: number
-  totalPages: number
+  pageTo: number
+  pageFrom: number
+  itemsPerPage: number
 }>()
 
 const emit = defineEmits<{
@@ -22,9 +21,9 @@ const currentPage = defineModel<number>({
     <div>
       <span class="text-sm leading-5">
         Affichage de
-        <span class="font-medium">{{ pageFrom }}</span>
+        <span class="font-medium">{{ pageFrom + 1 }}</span>
         à
-        <span class="font-medium">{{ pageTo }}</span>
+        <span class="font-medium">{{ pageTo + 1 }}</span>
         sur
         <span class="font-medium">{{ total }}</span>
         résultats
@@ -32,8 +31,8 @@ const currentPage = defineModel<number>({
     </div>
     <UPagination
       v-model="currentPage"
-      :page-count="pageCount"
-      :total="totalPages"
+      :page-count="itemsPerPage"
+      :total="total"
       :ui="{
         wrapper: 'flex items-center gap-1',
         rounded: '!rounded-full min-w-[32px] justify-center',

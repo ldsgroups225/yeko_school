@@ -17,7 +17,7 @@ async function validateQuery(query: unknown) {
 async function fetchClasses(client: ClientType, schoolId: string) {
   const { data, error } = await client.rpc('get_classes_by_school', { school_id: schoolId })
   if (error)
-    throw createError({ statusCode: 500, message: 'Erreur lors de la récupération des étudiants' })
+    throw createError({ statusCode: 500, message: 'Erreur lors de la récupération des élèves' })
   return data
 }
 

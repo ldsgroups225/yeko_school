@@ -10,7 +10,7 @@ const selectedYear = toRef(props, 'selectedYear')
 <template>
   <div class="flex items-center justify-between">
     <h2 class="text-xl font-semibold">
-      Liste des étudiants
+      Liste des élèves
     </h2>
     <div class="flex items-center space-x-2">
       <StudentDataManager />

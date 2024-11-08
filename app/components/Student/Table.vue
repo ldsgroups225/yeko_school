@@ -71,6 +71,7 @@ function getActionItems(row: IStudentDTO) {
     :rows="rows"
     :columns="columns"
     :loading="loading"
+    sort-mode="manual"
     sort-asc-icon="i-heroicons-arrow-up"
     sort-desc-icon="i-heroicons-arrow-down"
     :ui="{
