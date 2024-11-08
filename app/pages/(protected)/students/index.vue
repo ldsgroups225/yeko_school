@@ -22,6 +22,8 @@ interface IQueryParams {
 const { userData } = useUserStore()
 const studentStore = useStudentStore()
 const { updateStudent, updateLocalStudentList } = studentStore
+
+// TODO: Remove this
 const { isLoading, error } = storeToRefs(studentStore)
 
 // State

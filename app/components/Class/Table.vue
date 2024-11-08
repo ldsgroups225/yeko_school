@@ -1,16 +1,17 @@
 <script setup lang="ts">
+import type { IClassDTO } from '~~/types'
 import type { ICreateClassDTO } from '~~/utils/validators'
 import type { CLASS_COLUMNS } from '~/constants'
 
 defineProps<{
-  rows: ICreateClassDTO[]
+  rows: IClassDTO[]
   columns: typeof CLASS_COLUMNS
   loading: boolean
   pageFrom: number
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:selectedRows', value: ICreateClassDTO[]): void
+  (e: 'update:selectedRows', value: IClassDTO[]): void
   (e: 'update:sort', value: { column: string, direction: 'asc' | 'desc' } | null): void
   (e: 'showCreateOrUpdateModal', value: ICreateClassDTO): void
   (e: 'select', value: ICreateClassDTO): void
@@ -51,6 +52,7 @@ function getActionItems(row: ICreateClassDTO) {
     v-model:sort="sort"
     :rows="rows"
     :columns="columns"
+    sort-mode="manual"
     :loading="loading"
     sort-asc-icon="i-heroicons-arrow-up"
     sort-desc-icon="i-heroicons-arrow-down"

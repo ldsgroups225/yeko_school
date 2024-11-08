@@ -1,12 +1,13 @@
 <script setup lang="ts">
 defineProps<{
-  pageFrom: number
+  total: number
   pageTo: number
-  pageCount: number
-  totalItems: number
+  pageFrom: number
+  itemsPerPage: number
 }>()
 
 const emit = defineEmits<{
+  (e: 'update:currentPage', value: number): void
   (e: 'change', value: number): void
 }>()
 
@@ -20,18 +21,18 @@ const currentPage = defineModel<number>({
     <div>
       <span class="text-sm leading-5">
         Affichage de
-        <span class="font-medium">{{ pageFrom }}</span>
+        <span class="font-medium">{{ pageFrom + 1 }}</span>
         à
-        <span class="font-medium">{{ pageTo }}</span>
+        <span class="font-medium">{{ pageTo + 1 }}</span>
         sur
-        <span class="font-medium">{{ totalItems }}</span>
+        <span class="font-medium">{{ total }}</span>
         résultats
       </span>
     </div>
     <UPagination
       v-model="currentPage"
-      :page-count="parseInt(pageCount.toString())"
-      :total="totalItems"
+      :page-count="itemsPerPage"
+      :total="total"
       :ui="{
         wrapper: 'flex items-center gap-1',
         rounded: '!rounded-full min-w-[32px] justify-center',
@@ -41,6 +42,7 @@ const currentPage = defineModel<number>({
           },
         },
       }"
+      @update:model-value="(value) => emit('update:currentPage', value)"
       @change="emit('change', $event)"
     />
   </div>

@@ -16,7 +16,6 @@ export const STUDENT_COLUMNS = [
 ]
 
 export const CLASS_COLUMNS = [
-  { key: 'index', label: 'N°', sortable: true },
   { key: 'name', label: 'Nom', sortable: true },
   { key: 'mainTeacherId', label: 'Prof principal', sortable: true },
   { key: 'studentCount', label: 'Nbr d\'élèves', sortable: true },
