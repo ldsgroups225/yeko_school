@@ -1,10 +1,6 @@
 <script setup lang="ts">
+import type { ZError } from '~~/types'
 import { type ITeacherForm, teacherFormSchema } from '~~/utils/validators'
-
-interface ZError {
-  path: (string | number)[]
-  message: string
-}
 
 const toast = useToast()
 const userStore = useUserStore()

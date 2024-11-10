@@ -3,12 +3,14 @@ import type { EventHandlerRequest, H3Event } from 'h3'
 /**
  * Throws an error with a localized message based on the provided error code.
  *
+ * @param {H3Event<EventHandlerRequest>} event - The event object to set the response status.
  * @param {string} code - The error code to look up.
+ * @throws Will always throw an error with a localized message.
  * @returns {never} Never returns, as it throws an error.
  *
  * @example
  * try {
- *   throwI18nErrorBasedOnCode('invalid_credentials');
+ *   throwI18nErrorBasedOnCode(event, 'invalid_credentials');
  * } catch (error) {
  *   console.error(error.statusCode, error.message);
  *   // Output: 400 "Email ou mot de passe incorrect"

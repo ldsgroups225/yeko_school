@@ -267,3 +267,8 @@ export interface IScheduleCalendarDTO {
   endTime: string
   room?: string
 }
+
+export interface ZError {
+  path: (string | number)[]
+  message: string
+}

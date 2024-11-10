@@ -120,6 +120,23 @@ export const studentImportDTOSchema = z.object({
   avatarUrl: z.string().nullish(),
 })
 
+export const scheduleCreationSchema = z.object({
+  classId: z.string().uuid('Cette classe n\'existe pas').min(1, { message: 'Veillez sélectionner une classe.' }),
+  startTime: z.string().min(5, { message: 'L\'heure de début doit contenir au moins 5 caractères.' }).transform(val => val.trim()),
+  endTime: z.string().min(5, { message: 'L\'heure de fin doit contenir au moins 5 caractères.' }).transform(val => val.trim()),
+  dayOfWeek: z
+    .union([z.string(), z.number()])
+    .transform(val => Number(val))
+    .refine(val => val !== undefined, { message: 'Le jour de la semaine est invalide.' }),
+  subjectId: z.string({ required_error: 'Veuillez sélectionner une matière valide.' })
+    .uuid('Veuillez sélectionner une matière valide.')
+    .min(1, { message: 'Veuillez sélectionner une matière valide.' }),
+  teacherId: z.string().uuid('Cet enseignant n\'existe pas'),
+  room: refineStringAndNullify(z.string()).nullish(),
+})
+
+export type IScheduleCreationDTO = z.infer<typeof scheduleCreationSchema>
+
 export const scheduleImportDTOSchema = z.object({
   className: z.string().min(2, { message: 'Le nom de la classe doit contenir au moins 2 caractères.' }).transform(val => val.trim()),
   dayOfWeek: z

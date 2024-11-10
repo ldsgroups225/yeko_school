@@ -6,11 +6,11 @@ const { schedule } = defineProps<{
 }>()
 
 const days = [
-  { number: 1, name: 'Monday' },
-  { number: 2, name: 'Tuesday' },
-  { number: 3, name: 'Wednesday' },
-  { number: 4, name: 'Thursday' },
-  { number: 5, name: 'Friday' },
+  { number: 1, name: 'Lundi' },
+  { number: 2, name: 'Mardi' },
+  { number: 3, name: 'Mercredi' },
+  { number: 4, name: 'Jeudi' },
+  { number: 5, name: 'Vendredi' },
 ]
 
 function getEventsForDay(dayNumber: number) {
@@ -19,7 +19,7 @@ function getEventsForDay(dayNumber: number) {
 </script>
 
 <template>
-  <div class="rounded-lg shadow-sm p-4 mx-auto max-w-7xl overflow-x-auto">
+  <div class="rounded-lg shadow-sm p-4 mx-auto max-w-[100rem] overflow-x-auto">
     <div class="flex min-w-[800px]">
       <div class="w-16 flex-shrink-0">
         <ScheduleTimelineColumn />

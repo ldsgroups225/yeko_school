@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { IScheduleCalendarDTO } from '~~/types'
 import type { Database } from '~~/types/database.types'
+import { ERole, type IScheduleCalendarDTO } from '~~/types'
 import { formatFullName } from '~~/utils/formatting'
 
 // Store
@@ -13,6 +13,7 @@ const supabase = useSupabaseClient<Database>()
 
 // Refs
 const selectedClassId = ref<string | null>(null)
+const isScheduleEventCreationModalOpen = ref(false)
 
 const { data: classesGrouped, status: classGroupedFetchingStatus, execute: executeClassesGrouped } = useFetch(
   '/api/classes/classes_grouped_by_grade',
@@ -32,15 +33,36 @@ const { data: classesGrouped, status: classGroupedFetchingStatus, execute: execu
   },
 )
 
+const { data: subjects } = await useAsyncData('subjects', async () => {
+  const { data, error } = await supabase.from('subjects').select('id, name')
+  if (error) {
+    console.error('Error fetching subjects:', error)
+    return []
+  }
+  return data
+})
+
+const { data: teachers } = await useAsyncData('teachers', async () => {
+  const { data, error } = await supabase.from('users').select('id, first_name, last_name, user_roles(role_id)').eq('user_roles.role_id', ERole.TEACHER)
+
+  if (error) {
+    console.error('Error fetching subjects:', error)
+    return []
+  }
+
+  return data.map(d => ({ id: d.id, name: formatFullName(d.first_name, d.last_name) }))
+})
+
 const classesMerged = computed(() => classesGrouped.value?.flatMap(c => c.subclasses.map(s => ({ id: s.id, name: c.name }))) || [])
 
-const { data: schedules, execute: executeSchedules } = await useAsyncData('schedules', async () => {
+const { data: schedules, refresh: refreshSchedules } = await useLazyAsyncData('schedules', async () => {
   if (!userData?.school)
     throw new Error('Unauthorized')
 
   const { data, error } = await supabase.from('schedules')
     .select('*, subject: subjects(name), teacher: users(first_name, last_name)')
     .eq('class_id', selectedClassId.value!)
+    .order('day_of_week')
     .order('start_time')
   if (error)
     throw error
@@ -59,7 +81,7 @@ const { data: schedules, execute: executeSchedules } = await useAsyncData('sched
       id: d.id,
     } satisfies IScheduleCalendarDTO
   })
-})
+}, { immediate: false })
 
 const gradeHasSelectedSubclass = computed(() => {
   return (grade: { subclasses: { id: string }[] }) => {
@@ -67,7 +89,7 @@ const gradeHasSelectedSubclass = computed(() => {
   }
 })
 
-watchThrottled(selectedClassId, async () => await executeSchedules(), { throttle: 500 })
+watchThrottled(selectedClassId, async () => await refreshSchedules(), { throttle: 500 })
 
 function getDropdownItems(subclasses: { id: string, name: string }[]) {
   return subclasses.map(subclass => ({
@@ -133,10 +155,26 @@ onMounted(async () => await executeClassesGrouped())
       </div>
 
       <div v-else class="flex flex-col items-center justify-center h-full mt-10">
-        <h3 class="text-2xl font-bold mb-4">
-          Plage horaires de la classe {{ selectedClassName }}
-        </h3>
-        <ScheduleWeekly v-if="schedules" :schedule="schedules!" />
+        <div class="flex flex-row items-center justify-center gap-x-4 mb-4">
+          <h3 class="text-2xl font-bold">
+            Plage horaires de la classe {{ selectedClassName }}
+          </h3>
+
+          <UButton color="primary" @click="() => isScheduleEventCreationModalOpen = true">
+            Ajouter un horaire
+          </UButton>
+        </div>
+        <ScheduleWeekly v-if="schedules" :schedule="schedules!" class="w-full" />
+
+        <!-- Modal for adding a new schedule event -->
+        <ScheduleEventCreateModal
+          v-if=" userData?.school?.id !== null && userData?.school?.id !== undefined"
+          v-model:is-open="isScheduleEventCreationModalOpen"
+          :subjects="subjects || []"
+          :teachers="teachers || []"
+          :class-id="selectedClassId"
+          @refresh-schedules="refreshSchedules"
+        />
       </div>
     </div>
   </div>
