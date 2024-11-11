@@ -12,6 +12,7 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     '@nuxtjs/supabase',
     '@nuxt/image',
+    '@vueuse/motion/nuxt',
   ],
 
   image: {
