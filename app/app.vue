@@ -1,6 +1,11 @@
 <script lang="ts" setup>
 import { appName } from '~/constants'
 
+const appConfig = useAppConfig()
+
+appConfig.ui.primary = 'orange'
+appConfig.ui.gray = 'neutral'
+
 useHead({
   title: appName,
 })
