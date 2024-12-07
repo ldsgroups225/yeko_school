@@ -1,7 +1,7 @@
 import type { IClassDTO } from '~~/types'
+import { z } from 'zod'
 import { type ClientType, csServerSupabaseClient } from '~~/server/utils'
 import { formatFullName } from '~~/utils/formatting'
-import { z } from 'zod'
 
 /**
  * Schema for validating query parameters

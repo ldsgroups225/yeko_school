@@ -1,5 +1,5 @@
-import type { Database } from '~~/types/database.types'
 import type { H3Event } from 'h3'
+import type { Database } from '~~/types/database.types'
 import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
 
 export async function csServerSupabaseClient(event: H3Event) {

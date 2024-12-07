@@ -1,6 +1,6 @@
 import type { IStudentDTO } from '~~/types'
-import { type ClientType, csServerSupabaseClient } from '~~/server/utils'
 import { z } from 'zod'
+import { type ClientType, csServerSupabaseClient } from '~~/server/utils'
 
 /**
  * Zod schema for validating query parameters.

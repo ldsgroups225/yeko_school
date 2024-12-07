@@ -5,8 +5,8 @@
  */
 
 import type { ClientType } from '~~/server/utils'
-import { csServerSupabaseClient } from '~~/server/utils'
 import { z } from 'zod'
+import { csServerSupabaseClient } from '~~/server/utils'
 
 /**
  * Zod schema for validating the request body.

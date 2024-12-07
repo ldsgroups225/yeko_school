@@ -2,8 +2,8 @@
 import type { IClassDTO } from '~~/types'
 import type { Database } from '~~/types/database.types'
 import type { ICreateClassDTO } from '~~/utils/validators'
-import { formatFullName } from '~~/utils/formatting'
 import { snakeCase } from 'change-case'
+import { formatFullName } from '~~/utils/formatting'
 import { CLASS_COLUMNS, YEAR_OPTIONS } from '~/constants'
 
 interface IQueryParams {

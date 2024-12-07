@@ -1,6 +1,6 @@
+import { z } from 'zod'
 import { parseTime } from '~~/utils/dateTime'
 import { dayOfWeekMap } from '~~/utils/mapDaysOfTheWeek'
-import { z } from 'zod'
 
 export const updateStudentSchema = z.object({
   firstName: z.string().min(2, 'Le prénom ne peut pas être vide').max(50, 'Le prénom doit faire moins de 50 caractères').optional(),

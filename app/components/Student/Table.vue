@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { IStudentDTO } from '~~/types'
+import type { STUDENT_COLUMNS } from '~/constants'
 import { getAge } from '~~/utils/dateTime.js'
 import { formatFullName } from '~~/utils/formatting'
-import type { STUDENT_COLUMNS } from '~/constants'
 
 defineProps<{
   rows: IStudentDTO[]

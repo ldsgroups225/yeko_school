@@ -1,6 +1,6 @@
 import type { Class } from '~~/types'
-import { type ClientType, csServerSupabaseClient } from '~~/server/utils'
 import { z } from 'zod'
+import { type ClientType, csServerSupabaseClient } from '~~/server/utils'
 
 // Schema for query validation
 const querySchema = z.object({ schoolId: z.string().uuid() })

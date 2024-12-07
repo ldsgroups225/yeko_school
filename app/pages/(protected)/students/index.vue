@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { IStudentDTO } from '~~/types'
 import type { Database } from '~~/types/database.types'
-import { formatDate, getAge } from '~~/utils/dateTime.js'
 import { snakeCase } from 'change-case'
+import { formatDate, getAge } from '~~/utils/dateTime.js'
 import { STUDENT_COLUMNS, YEAR_OPTIONS } from '~/constants'
 
 interface IQueryParams {

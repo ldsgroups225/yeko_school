@@ -1,6 +1,6 @@
+import { z } from 'zod'
 import { csServerSupabaseClient } from '~~/server/utils'
 import { throwI18nErrorBasedOnCode } from '~~/utils/throwI18nErrorBasedOnCode'
-import { z } from 'zod'
 
 /**
  * Represents the structure of the login form data.

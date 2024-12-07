@@ -7,11 +7,11 @@
 import type { ClientType } from '~~/server/utils'
 import type { IClassDTO } from '~~/types'
 import type { IUpdateClassDTO } from '~~/utils/validators'
+import { z } from 'zod'
 import { csServerSupabaseClient } from '~~/server/utils'
 import { convertCase } from '~~/utils/caseConverter'
 import { formatFullName } from '~~/utils/formatting'
 import { updateClassSchema } from '~~/utils/validators'
-import { z } from 'zod'
 
 /**
  * Validates the class ID from the route parameter.
